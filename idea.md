@@ -13,7 +13,7 @@ Notified About Meal Timely
 Check Bus Timings
 Track Bus Location 
 Contacts To Driver and The Person In Charge
-6. Target Users / Audience: "Currently NST(Pune) Students and Staff)"
+6. Target Users / Audience: "Currently NST(Pune) Students and Staff"
 
 7. Technology Stack :
 
