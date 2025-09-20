@@ -1,30 +1,75 @@
-1. Project Title:  Food Review & Shuttel Tracker For NST students
+🍴🚌 Food Review & Shuttle Tracker for NST Students
+👤 Author
 
-2. Your Name & Roll Number: Aditya Singh 2024-B-22072006E
+Name: Aditya Singh
 
-3. Problem Statement : "As their is always an issue with in the hostel and reviews never reach properly theirs always a mediator so I want so that students can relay reviews and concerns indiviually to the staff and also theirs always problem bus being not on time or overcroweded which to students reaching late to their classes so fix this and so that no will give excuse of bus being late and if it is their a way to verify it."
+Roll Number: 2024-B-22072006E
 
-4. Proposed Solution: "My idea is to make an app for hostel mess where you will be notified about what is for dinner,lunch,breakfast,snacks and you can also view the menu for the week and also leave feedback after each meal, and I also plan to try implement a system such everybody can keep track of bus timings and if bus not available which driver shift is right now and whomto call and also somehow try to integrate a way to track the bus path."
-5. Key Features (List 4–6 main features you plan to implement) Example:
+❓ Problem Statement
 
-Weekly View Menu
-Provide Feedback
-Notified About Meal Timely
-Check Bus Timings
-Track Bus Location 
-Contacts To Driver and The Person In Charge
-6. Target Users / Audience: "Currently NST(Pune) Students and Staff"
+At NST hostels, food reviews and complaints often do not reach the staff directly due to intermediaries. This results in unresolved issues.
 
-7. Technology Stack :
+On the other hand, buses are frequently delayed or overcrowded, causing students to reach late for classes. Currently, there is no reliable system to verify delays or track bus schedules, leading to confusion and excuses.
 
-React-Native,(and external modules as per needed will be notified here after completion of First Release)
-8. Expected Outcome (What will the final output look like?) Example: "Become a staple for mess and food related issues to leave concerns and see improvement in the provided concerns. Students Keeping a better track of time with Bus timings given to them via app so they are not late for class."
+💡 Proposed Solution
 
-9. Timeline (Optional) (Rough plan for completion – weeks/months) Example:
+A mobile application that bridges communication gaps and improves punctuality:
 
-Week 1–2: Research on the Topic and Find necessary Tech and Data and also make a base of what to build upon
-Week 3–4: Do some tests for Backend & DataBase
-Week 5–6: Try to finish most of the project by this week
-Week 7: Testing & deployment
+🍽️ Mess Features
 
+Get notified about daily meals (breakfast, lunch, snacks, dinner).
 
+View the weekly mess menu in advance.
+
+Submit direct feedback after each meal (reaching staff instantly).
+
+🚌 Shuttle Features
+
+Access bus timings & availability in real time.
+
+See which driver is on shift and get their contact info.
+
+Track the bus location on a map (live GPS integration planned).
+
+⭐ Key Features
+
+📅 Weekly Menu View
+
+📝 Provide Feedback
+
+🔔 Meal Notifications
+
+⏰ Check Bus Timings
+
+📍 Track Bus Location
+
+☎️ Quick Contacts (Driver & Staff)
+
+🎯 Target Users
+
+🎓 NST (Pune) Students
+
+👨‍💼 NST Hostel & Transport Staff
+
+🛠️ Technology Stack
+
+📱 Frontend: React Native
+
+🗄️ Backend & Database: To be finalized after research (external modules to be added in v1.0)
+
+📈 Expected Outcome
+
+✔️ Students & staff communicate directly without a mediator.
+✔️ Mess food experience improves with transparent feedback.
+✔️ Students plan their commute better with real-time bus updates.
+✔️ Reduced excuses for lateness thanks to verifiable bus tracking.
+
+⏳ Project Timeline (Tentative)
+
+Week 1–2: Research, requirements gathering, tech stack decision.
+
+Week 3–4: Backend & database setup, initial testing.
+
+Week 5–6: Core features development (menu, feedback, bus system).
+
+Week 7: Final testing, bug fixes, deployment.
