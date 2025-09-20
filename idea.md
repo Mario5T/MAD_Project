@@ -1,75 +1,82 @@
-🍴🚌 Food Review & Shuttle Tracker for NST Students
-👤 Author
+# 🍴🚌 Food Review & Shuttle Tracker for NST Students  
 
-Name: Aditya Singh
+---
 
-Roll Number: 2024-B-22072006E
+## 👤 Author  
+- **Name:** Aditya Singh  
+- **Roll Number:** 2024-B-22072006E  
 
-❓ Problem Statement
+---
 
-At NST hostels, food reviews and complaints often do not reach the staff directly due to intermediaries. This results in unresolved issues.
+## ❓ Problem Statement  
 
-On the other hand, buses are frequently delayed or overcrowded, causing students to reach late for classes. Currently, there is no reliable system to verify delays or track bus schedules, leading to confusion and excuses.
+> Mess reviews and complaints often do not reach staff directly due to intermediaries, leaving student concerns unresolved.  
+>  
+> Additionally, buses are frequently delayed or overcrowded, causing students to reach classes late.  
+>  
+> Currently, there is no reliable way to verify bus delays or track shuttle schedules, leading to excuses and confusion.  
 
-💡 Proposed Solution
+---
 
-A mobile application that bridges communication gaps and improves punctuality:
+## 💡 Proposed Solution  
 
-🍽️ Mess Features
+A **React Native mobile application** to solve two main issues:  
 
-Get notified about daily meals (breakfast, lunch, snacks, dinner).
+### 🍽️ Hostel Mess  
+- Notifications for **breakfast, lunch, snacks, dinner**.  
+- **Weekly mess menu** view.  
+- Direct **feedback system** to staff (no mediator).  
 
-View the weekly mess menu in advance.
+### 🚌 Shuttle System  
+- Real-time **bus timings & availability**.  
+- Display **which driver is on shift** with contact details.  
+- (Planned) **Live bus tracking** using GPS.  
 
-Submit direct feedback after each meal (reaching staff instantly).
+---
 
-🚌 Shuttle Features
+## ⭐ Key Features  
 
-Access bus timings & availability in real time.
+| Feature | Description |
+|---------|-------------|
+| 📅 Weekly Menu View | Students can see the full week’s food schedule |
+| 📝 Provide Feedback | Direct communication to staff |
+| 🔔 Meal Notifications | Timely alerts for each meal |
+| ⏰ Check Bus Timings | Stay updated on shuttle availability |
+| 📍 Track Bus Location | Live GPS tracking of buses |
+| ☎️ Quick Contacts | Driver & staff phone numbers available |
 
-See which driver is on shift and get their contact info.
+---
 
-Track the bus location on a map (live GPS integration planned).
+## 🎯 Target Users  
+- 🎓 **NST (Pune) Students**  
+- 👨‍💼 **NST Hostel & Transport Staff**  
 
-⭐ Key Features
+---
 
-📅 Weekly Menu View
+## 🛠️ Technology Stack  
 
-📝 Provide Feedback
+- **Frontend:** React Native  
+- **Backend & Database:** To be finalized (v1.0 release)  
+- **External Modules:** Will be added as needed  
 
-🔔 Meal Notifications
+---
 
-⏰ Check Bus Timings
+## 📈 Expected Outcome  
 
-📍 Track Bus Location
+- ✅ Transparent **food feedback system**.  
+- ✅ Direct student–staff communication.  
+- ✅ Students can **track bus timings** and plan better.  
+- ✅ Eliminate excuses for lateness through **verifiable tracking**.  
 
-☎️ Quick Contacts (Driver & Staff)
+---
 
-🎯 Target Users
+## ⏳ Project Timeline (Tentative)  
 
-🎓 NST (Pune) Students
+| Week | Task |
+|------|------|
+| **1–2** | Research, requirements gathering, finalize tech stack |
+| **3–4** | Backend & database setup, test integrations |
+| **5–6** | Core features development (menu, feedback, bus info) |
+| **7**   | Testing, bug fixes, deployment |
 
-👨‍💼 NST Hostel & Transport Staff
-
-🛠️ Technology Stack
-
-📱 Frontend: React Native
-
-🗄️ Backend & Database: To be finalized after research (external modules to be added in v1.0)
-
-📈 Expected Outcome
-
-✔️ Students & staff communicate directly without a mediator.
-✔️ Mess food experience improves with transparent feedback.
-✔️ Students plan their commute better with real-time bus updates.
-✔️ Reduced excuses for lateness thanks to verifiable bus tracking.
-
-⏳ Project Timeline (Tentative)
-
-Week 1–2: Research, requirements gathering, tech stack decision.
-
-Week 3–4: Backend & database setup, initial testing.
-
-Week 5–6: Core features development (menu, feedback, bus system).
-
-Week 7: Final testing, bug fixes, deployment.
+---
