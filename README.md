@@ -1,3 +1,15 @@
+# 🚀 Contributing  
+
+If you’d like to contribute:  
+1. **Clone this repo**  
+2. Open it in **VS Code**  
+3. Run:  
+
+```bash
+npm install
+
+
+
 # 🍴🚌 Food Review & Shuttle Tracker for NST Students  
 
 ---
