@@ -1,15 +1,204 @@
+// import React, { useState, useEffect } from "react";
+// import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
+
+// const API_URL = "http://<your-server-ip>:5000/api/menu"; 
+
+// const FoodScreen = () => {
+//   const [menuData, setMenuData] = useState(null);
+//   const [days, setDays] = useState([]);
+//   const [selectedDay, setSelectedDay] = useState(null);
+//   const [loading, setLoading] = useState(true);
+
+//   useEffect(() => {
+//     fetch(API_URL)
+//       .then((res) => res.json())
+//       .then((data) => {
+//         setMenuData(data);
+//         const dayKeys = Object.keys(data);
+//         setDays(dayKeys);
+//         setSelectedDay(dayKeys[0]); 
+//       })
+//       .catch((err) => console.error("Error fetching menu:", err))
+//       .finally(() => setLoading(false));
+//   }, []);
+
+//   if (loading) {
+//     return (
+//       <View style={styles.center}>
+//         <ActivityIndicator size="large" color="#6c5ce7" />
+//         <Text>Loading menu...</Text>
+//       </View>
+//     );
+//   }
+
+//   if (!menuData || days.length === 0) {
+//     return (
+//       <View style={styles.center}>
+//         <Text>No menu available</Text>
+//       </View>
+//     );
+//   }
+
+//   const meals = menuData[selectedDay].meals;
+
+//   return (
+//     <View style={styles.container}>
+//       <FlatList
+//         data={days}
+//         horizontal
+//         showsHorizontalScrollIndicator={false}
+//         keyExtractor={(item) => item}
+//         renderItem={({ item }) => (
+//           <TouchableOpacity
+//             style={[
+//               styles.dayButton,
+//               selectedDay === item && styles.dayButtonActive,
+//             ]}
+//             onPress={() => setSelectedDay(item)}
+//           >
+//             <Text
+//               style={[
+//                 styles.dayText,
+//                 selectedDay === item && styles.dayTextActive,
+//               ]}
+//             >
+//               {item}
+//             </Text>
+//           </TouchableOpacity>
+//         )}
+//       />
+
+//       <Text style={styles.dateText}>{menuData[selectedDay].date}</Text>
+
+//       <FlatList
+//         data={Object.entries(meals)}
+//         keyExtractor={([category]) => category}
+//         renderItem={({ item }) => {
+//           const [category, food] = item;
+//           return (
+//             <View style={styles.mealCard}>
+//               <Text style={styles.mealCategory}>{category}</Text>
+//               <Text style={styles.mealFood}>{food}</Text>
+//             </View>
+//           );
+//         }}
+//       />
+//     </View>
+//   );
+// };
+
+// export default FoodScreen;
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: "#fff",
+//     paddingTop: 40,
+//     paddingHorizontal: 10,
+//   },
+//   center: {
+//     flex: 1,
+//     justifyContent: "center",
+//     alignItems: "center",
+//   },
+//   dayButton: {
+//     padding: 10,
+//     marginRight: 8,
+//     borderRadius: 8,
+//     backgroundColor: "#eee",
+//   },
+//   dayButtonActive: {
+//     backgroundColor: "#6c5ce7",
+//   },
+//   dayText: {
+//     fontSize: 16,
+//     color: "#333",
+//   },
+//   dayTextActive: {
+//     color: "#fff",
+//     fontWeight: "bold",
+//   },
+//   dateText: {
+//     fontSize: 16,
+//     fontWeight: "600",
+//     marginVertical: 10,
+//     textAlign: "center",
+//     color: "#6c5ce7",
+//   },
+//   mealCard: {
+//     backgroundColor: "#f8f8f8",
+//     padding: 15,
+//     marginVertical: 6,
+//     borderRadius: 10,
+//     shadowColor: "#000",
+//     shadowOpacity: 0.05,
+//     shadowRadius: 5,
+//     elevation: 2,
+//   },
+//   mealCategory: {
+//     fontSize: 14,
+//     fontWeight: "bold",
+//     color: "#2d3436",
+//   },
+//   mealFood: {
+//     fontSize: 14,
+//     color: "#636e72",
+//   },
+// });
+
+
+
+// My/screens/FoodScreen.jsx
 import React, { useState } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from "react-native";
-// import menuData from "../data/menu.json"; 
+
+// Temporary dummy data (replace with API later)
+const menuData = {
+  Monday: {
+    date: "2025-09-15",
+    meals: {
+      "HOT FOOD": "Aloo Paratha",
+      "CHUTNEY": "Curd",
+      "PICKLE": "Pickle",
+      "BEVERAGES": "Tea / Coffee",
+      "FRUITS": "Mix fruits",
+      "CEREALS": "Cornflakes & Chocos",
+      "BBJ": "BBJ",
+    },
+  },
+  Tuesday: {
+    date: "2025-09-16",
+    meals: {
+      "HOT FOOD": "Rawa Idli",
+      "CHUTNEY": "Coconut Green Chutney",
+      "PICKLE": "Sambar",
+      "BEVERAGES": "Tea/Coffee",
+      "FRUITS": "Mix fruits",
+      "CEREALS": "Cornflakes & Chocos",
+      "BBJ": "BBJ",
+    },
+  },
+  Wednesday: {
+    date: "2025-09-17",
+    meals: {
+      "HOT FOOD": "Kulcha",
+      "CHUTNEY": "Chandni Chok wali Chole",
+      "BEVERAGES": "Tea / Coffee",
+      "FRUITS": "Mix fruits",
+      "CEREALS": "Cornflakes & Chocos",
+      "BBJ": "BBJ",
+    },
+  },
+};
 
 const FoodScreen = () => {
   const days = Object.keys(menuData);
   const [selectedDay, setSelectedDay] = useState(days[0]);
-
   const meals = menuData[selectedDay].meals;
 
   return (
     <View style={styles.container}>
+      {/* Day Selector */}
       <FlatList
         data={days}
         horizontal
@@ -37,6 +226,7 @@ const FoodScreen = () => {
 
       <Text style={styles.dateText}>{menuData[selectedDay].date}</Text>
 
+      {/* Meals List */}
       <FlatList
         data={Object.entries(meals)}
         keyExtractor={([category]) => category}

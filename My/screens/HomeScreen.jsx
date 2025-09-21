@@ -6,7 +6,7 @@ const HomeScreen = ({ navigation }) => {
     <View style={styles.container}>
       <StatusBar style="auto" />
       <Text style={styles.title}>RevTracker</Text>
-      <Text style={styles.subtitle}>RVCE Campus Services</Text>
+      <Text style={styles.subtitle}>NST Campus Services</Text>
       
       <ScrollView style={styles.menuContainer}>
         <TouchableOpacity 
