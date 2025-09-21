@@ -1,7 +1,8 @@
 # 🚀 Contributing  
 
 If you’d like to contribute:  
-1. **Clone this repo**  
+1. **Clone this repo**  ```bash
+gh repo clone Mario5T/MAD_Project```
 2. Open it in **VS Code**  
 3. Run:  
 
