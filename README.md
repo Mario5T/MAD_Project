@@ -7,6 +7,7 @@ If you’d like to contribute:
 
 ```bash
 npm install
+```
 
 
 
