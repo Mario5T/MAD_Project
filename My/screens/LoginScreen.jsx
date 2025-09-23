@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -12,12 +12,10 @@ const LoginScreen = ({ navigation }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      const data = await res.json();
-      console.log(data);
       if (res.ok) {
-        // store token for authenticated requests
-        navigation.navigate("Home");
-      }
+  await AsyncStorage.setItem("token", data.token);
+  navigation.navigate("Home");
+}
     } catch (error) {
       console.error(error);
     }

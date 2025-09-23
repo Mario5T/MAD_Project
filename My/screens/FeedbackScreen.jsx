@@ -1,58 +1,60 @@
-import React, { useState } from "react";
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TextInput, 
-  TouchableOpacity, 
-  Alert 
-} from "react-native";
+import React, { useState, useContext } from "react";
+import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
+import { AuthContext } from "../context/authContext";
 
-const FeedbackScreen = () => {
-  const [rating, setRating] = useState(0);
+const API_URL = "http://localhost:3000";
+
+const FeedbackScreen = ({ navigation }) => {
+  const { authState } = useContext(AuthContext);
+  const [rating, setRating] = useState("");
   const [comment, setComment] = useState("");
 
-  const handleSubmit = () => {
-    if (rating === 0 || comment.trim() === "") {
-      Alert.alert("Incomplete", "Please provide both rating and feedback.");
+  const handleSubmit = async () => {
+    if (!auth.isLoggedIn) {
+      Alert.alert("Login Required", "Please log in to submit feedback.");
+      navigation.navigate("Auth");
       return;
     }
 
-    console.log("Feedback Submitted:", { rating, comment });
+    try {
+      const response = await fetch(`${API_URL}/feedback`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${auth.token}`,
+        },
+        body: JSON.stringify({ rating: Number(rating), comment }),
+      });
 
-    Alert.alert("Thank you!", "Your feedback has been submitted.");
-    setRating(0);
-    setComment("");
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to submit");
+
+      Alert.alert("Success", "Feedback submitted!");
+      setRating("");
+      setComment("");
+    } catch (err) {
+      Alert.alert("Error", err.message);
+    }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Food Feedback</Text>
-      <Text style={styles.subtitle}>How was your meal today?</Text>
-
-      <View style={styles.ratingContainer}>
-        {[1, 2, 3, 4, 5].map((num) => (
-          <TouchableOpacity 
-            key={num} 
-            onPress={() => setRating(num)}
-          >
-            <Text style={[styles.star, rating >= num && styles.starSelected]}>
-              ★
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
+      <Text style={styles.title}>Feedback</Text>
       <TextInput
         style={styles.input}
-        placeholder="Write your feedback here..."
+        placeholder="Rating (1-5)"
+        value={rating}
+        onChangeText={setRating}
+        keyboardType="numeric"
+      />
+      <TextInput
+        style={[styles.input, { height: 80 }]}
+        placeholder="Comment"
         value={comment}
         onChangeText={setComment}
         multiline
       />
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Submit Feedback</Text>
-      </TouchableOpacity>
+      <Button title="Submit Feedback" onPress={handleSubmit} />
     </View>
   );
 };
@@ -60,56 +62,7 @@ const FeedbackScreen = () => {
 export default FeedbackScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#f9f9f9",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
-    textAlign: "center",
-    color: "#1976D2",
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#555",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  ratingContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 20,
-  },
-  star: {
-    fontSize: 32,
-    color: "#ccc",
-    marginHorizontal: 5,
-  },
-  starSelected: {
-    color: "#FFD700", 
-  },
-  input: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 15,
-    height: 120,
-    textAlignVertical: "top",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: "#1976D2",
-    paddingVertical: 14,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "600",
-    fontSize: 16,
-  },
+  container: { flex: 1, padding: 20, justifyContent: "center" },
+  title: { fontSize: 20, fontWeight: "bold", marginBottom: 10 },
+  input: { borderWidth: 1, borderColor: "#ccc", marginBottom: 10, padding: 10, borderRadius: 8 },
 });

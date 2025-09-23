@@ -1,29 +1,30 @@
-
 import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
 import HomeScreen from "../screens/HomeScreen";
 import FoodScreen from "../screens/FoodScreen";
 import BusScreen from "../screens/BusScreen";
 import FeedbackScreen from "../screens/FeedbackScreen";
-
+import LoginScreen from "../screens/LoginScreen";
+import SignUpScreen from "../screens/SignUpScreen";
+import AuthScreen from "../screens/AuthScreen";
 
 const Stack = createStackNavigator();
 
 export default function AppNavigator() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen 
-          name="Home" 
-          component={HomeScreen} 
-          options={{ headerShown: false }} 
-        />
-        <Stack.Screen name="Food" component={FoodScreen} />
-        <Stack.Screen name="Bus" component={BusScreen} />
-        <Stack.Screen name="Feedback" component={FeedbackScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Stack.Navigator initialRouteName="Home">
+      <Stack.Screen 
+        name="Home" 
+        component={HomeScreen} 
+        options={{ headerShown: false }} 
+      />
+      <Stack.Screen name="Food" component={FoodScreen} />
+      <Stack.Screen name="Bus" component={BusScreen} />
+      <Stack.Screen name="Feedback" component={FeedbackScreen} />
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="SignUp" component={SignUpScreen} />
+      <Stack.Screen name="Auth" component={AuthScreen} /> 
+    </Stack.Navigator>
   );
 }
