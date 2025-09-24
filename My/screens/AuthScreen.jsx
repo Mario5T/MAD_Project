@@ -1,36 +1,62 @@
 import React, { useState, useContext } from "react";
-import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
-import { Picker } from "@react-native-picker/picker"; 
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  Alert,
+  TouchableOpacity,
+} from "react-native";
 import { AuthContext } from "../context/AuthContext";
 
-const API_URL = "http://localhost:3000"; // ⚠️ Use 10.0.2.2 for Android Emulator instead of localhost
+const API_URL = "http://20.2.0.23.181:3000/api/auth";
 
 const AuthScreen = ({ navigation }) => {
   const { setAuth } = useContext(AuthContext);
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
 
+  const [role, setRole] = useState("student");
   const [form, setForm] = useState({
     name: "",
     email: "",
     phone: "",
     password: "",
-    role: "student",
   });
 
   const handleSubmit = async () => {
-    if (!form.email || !form.password || (!isLogin && !form.name)) {
+    if (!form.password) {
       Alert.alert("Validation Error", "Please fill in all required fields.");
+      return;
+    }
+
+    if (role === "student" && !form.email) {
+      Alert.alert("Validation Error", "Email is required for student.");
+      return;
+    }
+    if (role === "driver" && !form.phone) {
+      Alert.alert("Validation Error", "Phone is required for driver.");
+      return;
+    }
+    if (!isLogin && !form.name) {
+      Alert.alert("Validation Error", "Name is required for signup.");
       return;
     }
 
     try {
       setLoading(true);
       const endpoint = isLogin ? "/auth/login" : "/auth/signup";
+
+      const payload =
+        role === "student"
+          ? { name: form.name, email: form.email, password: form.password, role }
+          : { name: form.name, phone: form.phone, password: form.password, role };
+
       const response = await fetch(`${API_URL}${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -38,11 +64,11 @@ const AuthScreen = ({ navigation }) => {
 
       if (isLogin) {
         setAuth({ isLoggedIn: true, token: data.token, role: data.role });
-        navigation.goBack();
+        navigation.replace("Home");
       } else {
         Alert.alert("Signup Successful", "You can now log in.");
         setIsLogin(true);
-        setForm({ name: "", email: "", phone: "", password: "", role: "student" });
+        setForm({ name: "", email: "", phone: "", password: "" });
       }
     } catch (err) {
       Alert.alert("Error", err.message);
@@ -55,6 +81,22 @@ const AuthScreen = ({ navigation }) => {
     <View style={styles.container}>
       <Text style={styles.title}>{isLogin ? "Login" : "Signup"}</Text>
 
+      <View style={styles.toggleContainer}>
+        <TouchableOpacity
+          style={[styles.toggleButton, role === "student" && styles.activeToggle]}
+          onPress={() => setRole("student")}
+        >
+          <Text style={styles.toggleText}>Student</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.toggleButton, role === "driver" && styles.activeToggle]}
+          onPress={() => setRole("driver")}
+        >
+          <Text style={styles.toggleText}>Driver</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Name (only on signup) */}
       {!isLogin && (
         <TextInput
           style={styles.input}
@@ -64,25 +106,27 @@ const AuthScreen = ({ navigation }) => {
         />
       )}
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        value={form.email}
-        onChangeText={(t) => setForm({ ...form, email: t })}
-      />
-
-      {!isLogin && (
+      {/* Student → Email, Driver → Phone */}
+      {role === "student" ? (
         <TextInput
           style={styles.input}
-          placeholder="Phone (for drivers)"
+          placeholder="Email"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          value={form.email}
+          onChangeText={(t) => setForm({ ...form, email: t })}
+        />
+      ) : (
+        <TextInput
+          style={styles.input}
+          placeholder="Phone"
           keyboardType="phone-pad"
           value={form.phone}
           onChangeText={(t) => setForm({ ...form, phone: t })}
         />
       )}
 
+      {/* Password (always shown) */}
       <TextInput
         style={styles.input}
         placeholder="Password"
@@ -90,20 +134,6 @@ const AuthScreen = ({ navigation }) => {
         value={form.password}
         onChangeText={(t) => setForm({ ...form, password: t })}
       />
-
-      {!isLogin && (
-        <View style={styles.pickerContainer}>
-          <Text style={styles.label}>Select Role:</Text>
-          <Picker
-            selectedValue={form.role}
-            onValueChange={(value) => setForm({ ...form, role: value })}
-            style={styles.picker}
-          >
-            <Picker.Item label="Student" value="student" />
-            <Picker.Item label="Driver" value="driver" />
-          </Picker>
-        </View>
-      )}
 
       <Button
         title={loading ? "Please wait..." : isLogin ? "Login" : "Signup"}
@@ -133,13 +163,25 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
   },
-  pickerContainer: {
+  toggleContainer: {
+    flexDirection: "row",
     marginBottom: 15,
+    justifyContent: "center",
+  },
+  toggleButton: {
+    flex: 1,
+    padding: 12,
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 8,
-    overflow: "hidden",
+    alignItems: "center",
+    borderRadius: 6,
+    marginHorizontal: 5,
   },
-  label: { padding: 8, fontWeight: "600" },
-  picker: { height: 50, width: "100%" },
+  activeToggle: {
+    backgroundColor: "#1976D2",
+  },
+  toggleText: {
+    color: "white",
+    fontWeight: "bold",
+  },
 });

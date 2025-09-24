@@ -2,7 +2,7 @@ import React, { useState, useContext } from "react";
 import { View, Text, TextInput, Button, StyleSheet, Alert } from "react-native";
 import { AuthContext } from "../context/AuthContext";
 
-const API_URL = "http://localhost:3000";
+const API_URL = "http://192.168.128.139:3000";
 
 const FeedbackScreen = ({ navigation }) => {
   const { authState } = useContext(AuthContext);
