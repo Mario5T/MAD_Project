@@ -6,9 +6,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Image,
+  StatusBar,
 } from "react-native";
 
-const API_URL = "http://192.168.128.139:3000/api/auth";
+const API_URL = "http://50.50.48.13:3000/api/auth";
+const PRIMARY_COLOR = "#00CED1"; 
 
 const SignUpScreen = ({ navigation }) => {
   const [role, setRole] = useState("student"); 
@@ -16,6 +19,7 @@ const SignUpScreen = ({ navigation }) => {
   const [email, setEmail] = useState(""); 
   const [phone, setPhone] = useState(""); 
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
     if (!name || !password || (role === "student" && !email) || (role === "driver" && !phone)) {
@@ -24,11 +28,14 @@ const SignUpScreen = ({ navigation }) => {
     }
 
     try {
+      setLoading(true);
       const payload =
         role === "student"
           ? { role, name, email, password }
           : { role, name, phone, password };
 
+      console.log("Sending payload:", JSON.stringify(payload));
+      
       const res = await fetch(`${API_URL}/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -40,9 +47,15 @@ const SignUpScreen = ({ navigation }) => {
 
       let data;
       try {
-        data = JSON.parse(text);
-      } catch {
-        throw new Error("Backend did not return JSON. Check API URL or server error.");
+        // Only attempt to parse if the response contains valid JSON
+        if (text && !text.includes("<") && text.trim()) {
+          data = JSON.parse(text);
+        } else {
+          throw new Error("Invalid response format");
+        }
+      } catch (parseError) {
+        console.error("Parse error:", parseError);
+        throw new Error("Server returned an invalid response. Please try again later.");
       }
 
       if (!res.ok) {
@@ -54,116 +67,256 @@ const SignUpScreen = ({ navigation }) => {
     } catch (error) {
       console.error("Signup error:", error.message);
       Alert.alert("Error", error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sign Up</Text>
-
-      <View style={styles.toggleContainer}>
-        <TouchableOpacity
-          style={[styles.toggleButton, role === "student" && styles.activeToggle]}
-          onPress={() => setRole("student")}
+      <StatusBar style="dark" />
+      
+  
+      <View style={styles.headerContainer}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
         >
-          <Text
-            style={[
-              styles.toggleText,
-              role === "student" && styles.activeToggleText,
-            ]}
-          >
-            Student
-          </Text>
+          <Image 
+            source={{ uri: 'https://img.icons8.com/ios-filled/50/000000/back.png' }}
+            style={styles.backIcon}
+          />
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.toggleButton, role === "driver" && styles.activeToggle]}
-          onPress={() => setRole("driver")}
-        >
-          <Text
-            style={[
-              styles.toggleText,
-              role === "driver" && styles.activeToggleText,
-            ]}
-          >
-            Driver
-          </Text>
-        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Sign Up</Text>
+        <View style={styles.placeholder} />
       </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        value={name}
-        onChangeText={setName}
-      />
+      <View style={styles.formContainer}>
+        <Text style={styles.title}>Create Account</Text>
+        <Text style={styles.subtitle}>Fill in your details to get started</Text>
 
-      {role === "student" ? (
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          value={email}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          onChangeText={setEmail}
-        />
-      ) : (
-        <TextInput
-          style={styles.input}
-          placeholder="Phone"
-          value={phone}
-          keyboardType="phone-pad"
-          onChangeText={setPhone}
-        />
-      )}
+        <View style={styles.toggleContainer}>
+          <TouchableOpacity
+            style={[styles.toggleButton, role === "student" && styles.activeToggle]}
+            onPress={() => setRole("student")}
+          >
+            <Text
+              style={[
+                styles.toggleText,
+                role === "student" && styles.activeToggleText,
+              ]}
+            >
+              Student
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.toggleButton, role === "driver" && styles.activeToggle]}
+            onPress={() => setRole("driver")}
+          >
+            <Text
+              style={[
+                styles.toggleText,
+                role === "driver" && styles.activeToggleText,
+              ]}
+            >
+              Driver
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+        <View style={styles.inputContainer}>
+          <Image 
+            source={{ uri: 'https://img.icons8.com/ios-filled/50/999999/user.png' }}
+            style={styles.inputIcon}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Name"
+            value={name}
+            onChangeText={setName}
+          />
+        </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-        <Text style={styles.buttonText}>Sign Up</Text>
-      </TouchableOpacity>
+        {role === "student" ? (
+          <View style={styles.inputContainer}>
+            <Image 
+              source={{ uri: 'https://img.icons8.com/ios-filled/50/999999/email.png' }}
+              style={styles.inputIcon}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={email}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              onChangeText={setEmail}
+            />
+          </View>
+        ) : (
+          <View style={styles.inputContainer}>
+            <Image 
+              source={{ uri: 'https://img.icons8.com/ios-filled/50/999999/phone.png' }}
+              style={styles.inputIcon}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Phone"
+              value={phone}
+              keyboardType="phone-pad"
+              onChangeText={setPhone}
+            />
+          </View>
+        )}
 
-      <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-        <Text style={styles.link}>Already have an account? Login</Text>
-      </TouchableOpacity>
+        <View style={styles.inputContainer}>
+          <Image 
+            source={{ uri: 'https://img.icons8.com/ios-filled/50/999999/password.png' }}
+            style={styles.inputIcon}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
+        </View>
+
+        <TouchableOpacity 
+          style={[styles.submitButton, loading && styles.disabledButton]}
+          onPress={handleSignUp}
+          disabled={loading}
+        >
+          <Text style={styles.submitButtonText}>
+            {loading ? "Please wait..." : "Sign Up"}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.switchModeButton}
+          onPress={() => navigation.navigate("Login")}
+        >
+          <Text style={styles.switchModeText}>Already have an account? Login</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", padding: 20, backgroundColor: "#fff" },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20, textAlign: "center" },
-
-  toggleContainer: { flexDirection: "row", justifyContent: "center", marginBottom: 20 },
+  container: { 
+    flex: 1, 
+    backgroundColor: '#f5f5f5',
+  },
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingTop: 50,
+    paddingHorizontal: 20,
+    paddingBottom: 15,
+    backgroundColor: '#fff',
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  backIcon: {
+    width: 20,
+    height: 20,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
+  },
+  placeholder: {
+    width: 40,
+  },
+  formContainer: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#fff',
+  },
+  title: { 
+    fontSize: 24, 
+    fontWeight: "bold", 
+    marginBottom: 10, 
+    textAlign: "center",
+    color: "#333",
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 30,
+    textAlign: "center",
+  },
+  toggleContainer: { 
+    flexDirection: "row", 
+    justifyContent: "center", 
+    marginBottom: 25 
+  },
   toggleButton: {
     flex: 1,
     paddingVertical: 12,
     marginHorizontal: 5,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: "#1976D2",
+    borderColor: PRIMARY_COLOR,
     alignItems: "center",
     backgroundColor: "#fff",
   },
-  activeToggle: { backgroundColor: "#1976D2" },
-  toggleText: { color: "#1976D2", fontWeight: "600" },
+  activeToggle: { backgroundColor: PRIMARY_COLOR },
+  toggleText: { color: PRIMARY_COLOR, fontWeight: "600" },
   activeToggleText: { color: "#fff", fontWeight: "bold" },
 
-  input: {
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
-    borderColor: "#ccc",
-    padding: 12,
-    marginBottom: 12,
+    borderColor: "#ddd",
+    marginBottom: 15,
     borderRadius: 8,
+    backgroundColor: "#f9f9f9",
+    paddingHorizontal: 10,
   },
-  button: { backgroundColor: "#1976D2", padding: 15, borderRadius: 8, marginBottom: 10 },
-  buttonText: { color: "white", textAlign: "center", fontWeight: "bold" },
-  link: { color: "#1976D2", textAlign: "center", marginTop: 10 },
+  inputIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 10,
+    opacity: 0.5,
+  },
+  input: {
+    flex: 1,
+    padding: 12,
+    fontSize: 16,
+    color: "#333",
+  },
+  submitButton: {
+    backgroundColor: PRIMARY_COLOR,
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  disabledButton: {
+    backgroundColor: "#cccccc",
+  },
+  submitButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+  switchModeButton: {
+    alignItems: "center",
+  },
+  switchModeText: {
+    color: PRIMARY_COLOR,
+    fontSize: 14,
+  },
 });
 
 export default SignUpScreen;
