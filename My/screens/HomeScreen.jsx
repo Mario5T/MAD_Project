@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { 
   View, 
   Text, 
@@ -12,34 +12,25 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from "expo-status-bar";
+import { AuthContext } from "../context/AuthContext";
 
 const { width } = Dimensions.get('window');
 const PRIMARY_COLOR = "#00CED1"; 
 
 const HomeScreen = ({ navigation }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { authState } = useContext(AuthContext);
   const [searchQuery, setSearchQuery] = useState("");
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const token = await AsyncStorage.getItem("token");
-      setIsLoggedIn(!!token);
-    };
-
-    const unsubscribe = navigation.addListener("focus", checkAuth);
-    return unsubscribe;
-  }, [navigation]);
+  const isLoggedIn = authState.isLoggedIn;
+  const userRole = authState.user?.role;
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem("token");
-    setIsLoggedIn(false);
+    await AsyncStorage.multiRemove(["token", "userRole"]);
   };
 
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      
-      {/* Header with back button */}
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backButton}>
           <Image 
@@ -50,8 +41,6 @@ const HomeScreen = ({ navigation }) => {
         <Text style={styles.headerTitle}>Home</Text>
         <View style={styles.placeholder} />
       </View>
-
-      {/* Search Section */}
       <View style={styles.searchSection}>
         <Text style={styles.searchTitle}>What do</Text>
         <Text style={styles.searchTitleBold}>You want?</Text>
@@ -71,8 +60,6 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
-
-      {/* Categories */}
       <View style={styles.categoriesContainer}>
         <View style={styles.categoryRow}>
           <TouchableOpacity 
@@ -101,6 +88,25 @@ const HomeScreen = ({ navigation }) => {
             <Text style={styles.categoryText}>Booking Ride</Text>
           </TouchableOpacity>
         </View>
+        {userRole === "admin" && (
+          <View style={styles.adminSection}>
+            <Text style={styles.adminSectionTitle}>Admin Panel</Text>
+            <View style={styles.categoryRow}>
+              <TouchableOpacity 
+                style={styles.categoryItem}
+                onPress={() => navigation.navigate("Upload")}
+              >
+                <View style={styles.categoryIconContainer}>
+                  <Image 
+                    source={{ uri: 'https://img.icons8.com/ios-filled/50/00CED1/upload.png' }}
+                    style={styles.categoryIcon}
+                  />
+                </View>
+                <Text style={styles.categoryText}>Upload Menu</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
         
         <View style={styles.categoryRow}>
           <TouchableOpacity 
@@ -142,8 +148,6 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
-
-      {/* Bottom Navigation */}
       <View style={styles.bottomNavContainer}>
         <TouchableOpacity style={styles.navItem}>
           <Image 
@@ -154,7 +158,7 @@ const HomeScreen = ({ navigation }) => {
         
         <TouchableOpacity 
           style={styles.navItem}
-          onPress={() => navigation.navigate("Favorites")}
+          onPress={() => navigation.navigate("Food")}
         >
           <Image 
             source={{ uri: 'https://img.icons8.com/ios-filled/50/999999/star.png' }}
@@ -164,7 +168,7 @@ const HomeScreen = ({ navigation }) => {
         
         <TouchableOpacity 
           style={styles.navItem}
-          onPress={() => navigation.navigate("Notifications")}
+          onPress={() => navigation.navigate("Bus")}
         >
           <Image 
             source={{ uri: 'https://img.icons8.com/ios-filled/50/999999/notification.png' }}
@@ -264,10 +268,16 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
   },
-  categoriesContainer: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 20,
+  adminSection: {
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  adminSectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 15,
+    marginLeft: 5,
   },
   categoryRow: {
     flexDirection: 'row',

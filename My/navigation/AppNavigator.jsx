@@ -8,6 +8,8 @@ import FeedbackScreen from "../screens/FeedbackScreen";
 import LoginScreen from "../screens/LoginScreen";
 import SignUpScreen from "../screens/SignUpScreen";
 import AuthScreen from "../screens/AuthScreen";
+import UploadScreen from "../screens/UploadScreen";
+import ProfileScreen from "../screens/ProfileScreen";
 
 const Stack = createStackNavigator();
 
@@ -25,6 +27,8 @@ export default function AppNavigator() {
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="SignUp" component={SignUpScreen} />
       <Stack.Screen name="Auth" component={AuthScreen} /> 
+      <Stack.Screen name="Upload" component={UploadScreen} />
+      <Stack.Screen name="Profile" component={ProfileScreen} />
     </Stack.Navigator>
   );
 }

@@ -12,7 +12,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../context/AuthContext";
 
-const API_URL = "http://50.50.48.13:3000/api/auth"; 
+const API_URL = "http://10.254.201.15:3000/api/auth"; 
 const PRIMARY_COLOR = "#00CED1";
 
 const LoginScreen = ({ navigation }) => {
@@ -45,7 +45,6 @@ const LoginScreen = ({ navigation }) => {
 
       let data;
       try {
-        // Only attempt to parse if the response contains valid JSON
         if (text && !text.includes("<") && text.trim()) {
           data = JSON.parse(text);
         } else {
@@ -65,8 +64,6 @@ const LoginScreen = ({ navigation }) => {
       }
 
       await AsyncStorage.setItem("token", data.token);
-      
-      // Update the AuthContext state
       setAuthState({ 
         isLoggedIn: true, 
         user: { 
@@ -135,8 +132,6 @@ const LoginScreen = ({ navigation }) => {
             </Text>
           </TouchableOpacity>
         </View>
-
-        {/* Inputs */}
         {role === "student" ? (
           <View style={styles.inputContainer}>
             <Image
@@ -181,8 +176,6 @@ const LoginScreen = ({ navigation }) => {
             onChangeText={setPassword}
           />
         </View>
-
-        {/* Submit */}
         <TouchableOpacity
           style={[styles.submitButton, loading && styles.disabledButton]}
           onPress={handleLogin}
@@ -192,8 +185,6 @@ const LoginScreen = ({ navigation }) => {
             {loading ? "Please wait..." : "Login"}
           </Text>
         </TouchableOpacity>
-
-        {/* Switch to Signup */}
         <TouchableOpacity
           style={styles.switchModeButton}
           onPress={() => navigation.navigate("SignUp")}

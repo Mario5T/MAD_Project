@@ -10,7 +10,7 @@ import {
   StatusBar,
 } from "react-native";
 
-const API_URL = "http://50.50.48.13:3000/api/auth";
+const API_URL = "http://10.254.201.15:3000/api/auth";
 const PRIMARY_COLOR = "#00CED1"; 
 
 const SignUpScreen = ({ navigation }) => {
@@ -47,7 +47,6 @@ const SignUpScreen = ({ navigation }) => {
 
       let data;
       try {
-        // Only attempt to parse if the response contains valid JSON
         if (text && !text.includes("<") && text.trim()) {
           data = JSON.parse(text);
         } else {

@@ -9,9 +9,10 @@ import {
   Image,
   StatusBar,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../context/AuthContext";
 
-const API_URL = "http://50.50.48.13:3000/api/auth";
+const API_URL = "http://10.254.201.15:3000/api/auth";
 const PRIMARY_COLOR = "#00CED1";
 
 const AuthScreen = ({ navigation }) => {
@@ -41,6 +42,10 @@ const AuthScreen = ({ navigation }) => {
       Alert.alert("Validation Error", "Phone is required for driver.");
       return;
     }
+    if (role === "admin" && !form.email) {
+      Alert.alert("Validation Error", "Email is required for admin.");
+      return;
+    }
     if (!isLogin && !form.name) {
       Alert.alert("Validation Error", "Name is required for signup.");
       return;
@@ -52,6 +57,8 @@ const AuthScreen = ({ navigation }) => {
 
       const payload =
         role === "student"
+          ? { name: form.name, email: form.email, password: form.password, role }
+          : role === "admin"
           ? { name: form.name, email: form.email, password: form.password, role }
           : { name: form.name, phone: form.phone, password: form.password, role };
 
@@ -86,6 +93,9 @@ const AuthScreen = ({ navigation }) => {
         if (!data.token) {
           throw new Error("No token received from server.");
         }
+        await AsyncStorage.setItem("token", data.token);
+        await AsyncStorage.setItem("userRole", data.role);
+        
         setAuthState({ isLoggedIn: true, user: { token: data.token, role: data.role } });
         navigation.replace("Home");
       } else {
@@ -125,7 +135,7 @@ const AuthScreen = ({ navigation }) => {
             : "Fill in your details to get started"}
         </Text>
 
-        <View style={styles.toggleContainer}>
+        <View style={styles.toggleContainerAdminStudentDriverContainer}>
           <TouchableOpacity
             style={[styles.toggleButton, role === "student" && styles.activeToggle]}
             onPress={() => setRole("student")}
@@ -140,6 +150,14 @@ const AuthScreen = ({ navigation }) => {
           >
             <Text style={[styles.toggleText, role === "driver" && styles.activeToggleText]}>
               Driver
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.toggleButton, role === "admin" && styles.activeToggle]}
+            onPress={() => setRole("admin")}
+          >
+            <Text style={[styles.toggleText, role === "admin" && styles.activeToggleText]}>
+              Admin
             </Text>
           </TouchableOpacity>
         </View>
@@ -159,7 +177,7 @@ const AuthScreen = ({ navigation }) => {
           </View>
         )}
 
-        {role === "student" ? (
+        {role === "student" || role === "admin" ? (
           <View style={styles.inputContainer}>
             <Image 
               source={{ uri: 'https://img.icons8.com/ios-filled/50/999999/email.png' }}
@@ -251,6 +269,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 10, textAlign: "center", color: "#333" },
   subtitle: { fontSize: 16, color: "#666", marginBottom: 30, textAlign: "center" },
   toggleContainer: { flexDirection: "row", marginBottom: 25, justifyContent: "center" },
+  toggleContainerAdminStudentDriverContainer: { flexDirection: "row", marginBottom: 25, justifyContent: "center" },
   toggleButton: {
     flex: 1,
     padding: 12,

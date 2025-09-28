@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { AuthContext } from "../context/AuthContext";
 
-const API_URL = "http://50.50.48.13:3000";
+const API_URL = "http://10.254.201.15:3000";
 
 const StarRating = ({ rating, setRating }) => {
   const renderStars = () => {
