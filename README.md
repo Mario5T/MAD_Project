@@ -93,5 +93,5 @@ A **React Native mobile application** to solve two main issues:
 | **3–4** | Backend & database setup, test integrations |
 | **5–6** | Core features development (menu, feedback, bus info) |
 | **7**   | Testing, bug fixes, deployment |
-😶‍🌫️
+
 ---
