@@ -1,22 +1,30 @@
 import React, { useState, useContext } from "react";
 import {
   View,
-  Text,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
   Alert,
-  Image,
   StatusBar,
 } from "react-native";
+import {
+  Text,
+  TextInput,
+  Button,
+  Card,
+  Title,
+  RadioButton,
+  useTheme,
+  Surface,
+  ActivityIndicator
+} from 'react-native-paper';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../context/AuthContext";
 
-const API_URL = "http://10.254.201.15:3000/api/auth"; 
+const API_URL = "https://mad-backend-5ijo.onrender.com"
 const PRIMARY_COLOR = "#00CED1";
 
 const LoginScreen = ({ navigation }) => {
   const { setAuthState } = useContext(AuthContext);
+  const theme = useTheme();
   const [role, setRole] = useState("student");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -34,7 +42,7 @@ const LoginScreen = ({ navigation }) => {
 
       console.log("Sending payload:", JSON.stringify(payload));
       
-      const res = await fetch(`${API_URL}/auth/login`, {
+      const res = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -83,121 +91,99 @@ const LoginScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <StatusBar style="dark" />
-
-      <View style={styles.headerContainer}>
-        <TouchableOpacity
-          style={styles.backButton}
+      <Surface style={styles.headerContainer}>
+        <Button
+          mode="text"
           onPress={() => navigation.goBack()}
+          icon="arrow-left"
+          style={styles.backButton}
         >
-          <Image
-            source={{ uri: "https://img.icons8.com/ios-filled/50/000000/back.png" }}
-            style={styles.backIcon}
-          />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Login</Text>
+        </Button>
+        <Title style={[styles.headerTitle, { color: theme.colors.onSurface }]}>Login</Title>
         <View style={styles.placeholder} />
-      </View>
+      </Surface>
 
-      <View style={styles.formContainer}>
-        <Text style={styles.title}>Welcome Back</Text>
-        <Text style={styles.subtitle}>Sign in to access your account</Text>
+      <Card style={styles.formContainer}>
+        <Card.Content>
+          <Title style={[styles.title, { color: theme.colors.onSurface }]}>Welcome Back</Title>
+          <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>Sign in to access your account</Text>
 
-        <View style={styles.toggleContainer}>
-          <TouchableOpacity
-            style={[styles.toggleButton, role === "student" && styles.activeToggle]}
-            onPress={() => setRole("student")}
-          >
-            <Text
-              style={[
-                styles.toggleText,
-                role === "student" && styles.activeToggleText,
-              ]}
-            >
-              Student
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.toggleButton, role === "driver" && styles.activeToggle]}
-            onPress={() => setRole("driver")}
-          >
-            <Text
-              style={[
-                styles.toggleText,
-                role === "driver" && styles.activeToggleText,
-              ]}
-            >
-              Driver
-            </Text>
-          </TouchableOpacity>
-        </View>
-        {role === "student" ? (
-          <View style={styles.inputContainer}>
-            <Image
-              source={{ uri: "https://img.icons8.com/ios-filled/50/999999/email.png" }}
-              style={styles.inputIcon}
-            />
+          <View style={styles.toggleContainer}>
+            <Text style={[styles.roleLabel, { color: theme.colors.onSurface }]}>Select Role:</Text>
+            <RadioButton.Group onValueChange={setRole} value={role}>
+              <View style={styles.radioRow}>
+                <RadioButton value="student" />
+                <Text style={[styles.radioLabel, { color: theme.colors.onSurface }]}>Student</Text>
+              </View>
+              <View style={styles.radioRow}>
+                <RadioButton value="driver" />
+                <Text style={[styles.radioLabel, { color: theme.colors.onSurface }]}>Driver</Text>
+              </View>
+            </RadioButton.Group>
+          </View>
+          {role === "student" ? (
             <TextInput
-              style={styles.input}
-              placeholder="Email"
+              mode="outlined"
+              label="Email"
               value={email}
+              onChangeText={setEmail}
               autoCapitalize="none"
               keyboardType="email-address"
-              onChangeText={setEmail}
-            />
-          </View>
-        ) : (
-          <View style={styles.inputContainer}>
-            <Image
-              source={{ uri: "https://img.icons8.com/ios-filled/50/999999/phone.png" }}
-              style={styles.inputIcon}
-            />
-            <TextInput
+              left={<TextInput.Icon icon="email" />}
               style={styles.input}
-              placeholder="Phone"
-              value={phone}
-              keyboardType="phone-pad"
-              onChangeText={setPhone}
             />
-          </View>
-        )}
+          ) : (
+            <TextInput
+              mode="outlined"
+              label="Phone"
+              value={phone}
+              onChangeText={setPhone}
+              keyboardType="phone-pad"
+              left={<TextInput.Icon icon="phone" />}
+              style={styles.input}
+            />
+          )}
 
-        <View style={styles.inputContainer}>
-          <Image
-            source={{ uri: "https://img.icons8.com/ios-filled/50/999999/password.png" }}
-            style={styles.inputIcon}
-          />
           <TextInput
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry
+            mode="outlined"
+            label="Password"
             value={password}
             onChangeText={setPassword}
+            secureTextEntry
+            left={<TextInput.Icon icon="lock" />}
+            style={styles.input}
           />
-        </View>
-        <TouchableOpacity
-          style={[styles.submitButton, loading && styles.disabledButton]}
-          onPress={handleLogin}
-          disabled={loading}
-        >
-          <Text style={styles.submitButtonText}>
+          
+          <Button
+            mode="contained"
+            onPress={handleLogin}
+            disabled={loading}
+            loading={loading}
+            style={styles.submitButton}
+            contentStyle={styles.submitButtonContent}
+          >
             {loading ? "Please wait..." : "Login"}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.switchModeButton}
-          onPress={() => navigation.navigate("SignUp")}
-        >
-          <Text style={styles.switchModeText}>Don't have an account? Sign Up</Text>
-        </TouchableOpacity>
-      </View>
+          </Button>
+          
+          <Button
+            mode="text"
+            onPress={() => navigation.navigate("SignUp")}
+            style={styles.switchModeButton}
+          >
+            Don't have an account? Sign Up
+          </Button>
+        </Card.Content>
+      </Card>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f5f5f5" },
+  container: { 
+    flex: 1,
+  },
   headerContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -205,50 +191,62 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 15,
-    backgroundColor: "#fff",
+    elevation: 4,
   },
-  backButton: { width: 40, height: 40, justifyContent: "center", alignItems: "center" },
-  backIcon: { width: 20, height: 20 },
-  headerTitle: { fontSize: 18, fontWeight: "600", color: "#333" },
-  placeholder: { width: 40 },
-  formContainer: { flex: 1, padding: 20, backgroundColor: "#fff" },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 10, textAlign: "center", color: "#333" },
-  subtitle: { fontSize: 16, color: "#666", marginBottom: 30, textAlign: "center" },
-  toggleContainer: { flexDirection: "row", justifyContent: "center", marginBottom: 25 },
-  toggleButton: {
-    flex: 1,
-    paddingVertical: 12,
-    marginHorizontal: 5,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: PRIMARY_COLOR,
-    alignItems: "center",
-    backgroundColor: "#fff",
+  backButton: { 
+    width: 40, 
+    height: 40,
   },
-  activeToggle: { backgroundColor: PRIMARY_COLOR },
-  toggleText: { color: PRIMARY_COLOR, fontWeight: "600" },
-  activeToggleText: { color: "#fff", fontWeight: "bold" },
-  inputContainer: {
+  headerTitle: { 
+    fontSize: 18, 
+    fontWeight: "600",
+  },
+  placeholder: { 
+    width: 40 
+  },
+  formContainer: { 
+    flex: 1, 
+    margin: 20,
+    marginTop: 40,
+  },
+  title: { 
+    fontSize: 24, 
+    fontWeight: "bold", 
+    marginBottom: 10, 
+    textAlign: "center",
+  },
+  subtitle: { 
+    fontSize: 16, 
+    marginBottom: 30, 
+    textAlign: "center",
+  },
+  toggleContainer: { 
+    marginBottom: 25,
+  },
+  roleLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 10,
+  },
+  radioRow: {
     flexDirection: "row",
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    marginBottom: 15,
-    borderRadius: 8,
-    backgroundColor: "#f9f9f9",
-    paddingHorizontal: 10,
+    marginBottom: 5,
   },
-  inputIcon: { width: 20, height: 20, marginRight: 10, opacity: 0.5 },
-  input: { flex: 1, padding: 12, fontSize: 16, color: "#333" },
+  radioLabel: {
+    fontSize: 16,
+    marginLeft: 8,
+  },
+  input: { 
+    marginBottom: 15,
+  },
   submitButton: {
-    backgroundColor: PRIMARY_COLOR,
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
     marginTop: 10,
     marginBottom: 20,
   },
-  disabledButton: { backgroundColor: "#cccccc" },
+  submitButtonContent: {
+    paddingVertical: 8,
+  },
   submitButtonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
   switchModeButton: { alignItems: "center" },
   switchModeText: { color: PRIMARY_COLOR, fontSize: 14 },

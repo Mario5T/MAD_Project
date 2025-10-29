@@ -12,12 +12,13 @@ import {
   Card, 
   useTheme,
   Surface,
+  Appbar,
 } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AuthContext } from "../context/AuthContext";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const { width } = Dimensions.get('window'); 
+const { width } = Dimensions.get('window');
 
 const HomeScreen = ({ navigation }) => {
   const { authState } = useContext(AuthContext);
@@ -112,7 +113,7 @@ const HomeScreen = ({ navigation }) => {
           Access all campus services from one convenient dashboard
         </Text>
       </LinearGradient>
-      
+
       {/* Cards Grid */}
       <ScrollView 
         style={styles.scrollView}
@@ -149,7 +150,7 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
         ))}
       </ScrollView>
-      
+
       {/* Bottom Navigation */}
       <Surface style={styles.bottomNav} elevation={4}>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Home')}>

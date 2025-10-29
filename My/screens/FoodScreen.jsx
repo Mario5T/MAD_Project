@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
+import { View, FlatList, StyleSheet, Platform } from "react-native";
+import {
+  Text,
+  Card,
+  Title,
+  Chip,
+  ActivityIndicator,
+  useTheme,
+  Surface,
+  Appbar
+} from 'react-native-paper';
 
-const API_URL = "http://10.254.201.15:3000/api/menu";
-
-const FoodScreen = () => {
+const API_URL = "https://mad-backend-5ijo.onrender.com"
+const FoodScreen = ({ navigation }) => {
+  const theme = useTheme();
   const [menuData, setMenuData] = useState(null);
   const [days, setDays] = useState([]);
   const [selectedDay, setSelectedDay] = useState(null);
@@ -16,9 +26,9 @@ const FoodScreen = () => {
   const fetchMenuData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/all`);
+      const response = await fetch(`${API_URL}/api/menu/all`);
       const data = await response.json();
-      
+
       if (response.ok) {
         setMenuData(data);
         const dayKeys = Object.keys(data);
@@ -36,17 +46,17 @@ const FoodScreen = () => {
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#6c5ce7" />
-        <Text>Loading menu...</Text>
+      <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
+        <ActivityIndicator size="large" animating={true} color={theme.colors.primary} />
+        <Text style={{ color: theme.colors.onBackground, marginTop: 16 }}>Loading menu...</Text>
       </View>
     );
   }
 
   if (!menuData || days.length === 0) {
     return (
-      <View style={styles.center}>
-        <Text>No menu available</Text>
+      <View style={[styles.center, { backgroundColor: theme.colors.background }]}>
+        <Text style={{ color: theme.colors.onBackground }}>No menu available</Text>
       </View>
     );
   }
@@ -54,46 +64,55 @@ const FoodScreen = () => {
   const meals = menuData[selectedDay].meals;
 
   return (
-    <View style={styles.container}>
-      <FlatList
-        data={days}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[
-              styles.dayButton,
-              selectedDay === item && styles.dayButtonActive,
-            ]}
-            onPress={() => setSelectedDay(item)}
-          >
-            <Text
-              style={[
-                styles.dayText,
-                selectedDay === item && styles.dayTextActive,
-              ]}
-            >
-              {item}
-            </Text>
-          </TouchableOpacity>
-        )}
-      />
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Appbar.Header style={{ backgroundColor: theme.colors.surface }}>
+        <Appbar.BackAction onPress={() => navigation.goBack()} />
+        <Appbar.Content title="Food Menu" />
+      </Appbar.Header>
 
-      <Text style={styles.dateText}>{menuData[selectedDay].date}</Text>
-      <FlatList
-        data={Object.entries(meals)}
-        keyExtractor={([category]) => category}
-        renderItem={({ item }) => {
-          const [category, food] = item;
-          return (
-            <View style={styles.mealCard}>
-              <Text style={styles.mealCategory}>{category}</Text>
-              <Text style={styles.mealFood}>{food}</Text>
-            </View>
-          );
-        }}
-      />
+        <Surface style={styles.daySelector}>
+          <FlatList
+            data={days}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => item}
+            renderItem={({ item }) => (
+              <Chip
+                mode={selectedDay === item ? 'flat' : 'outlined'}
+                selected={selectedDay === item}
+                onPress={() => setSelectedDay(item)}
+                style={styles.dayChip}
+                textStyle={{ color: selectedDay === item ? theme.colors.onPrimary : theme.colors.onSurface }}
+              >
+                {item}
+              </Chip>
+            )}
+          />
+        </Surface>
+
+        <Title style={[styles.dateText, { color: theme.colors.primary }]}>
+          {menuData[selectedDay].date}
+        </Title>
+
+        <FlatList
+          data={Object.entries(meals)}
+          keyExtractor={([category]) => category}
+          renderItem={({ item }) => {
+            const [category, food] = item;
+            return (
+              <Card style={styles.mealCard} mode="elevated">
+                <Card.Content>
+                  <Title style={[styles.mealCategory, { color: theme.colors.onSurface }]}>
+                    {category}
+                  </Title>
+                  <Text style={[styles.mealFood, { color: theme.colors.onSurfaceVariant }]}>
+                    {food}
+                  </Text>
+                </Card.Content>
+              </Card>
+            );
+          }}
+        />
     </View>
   );
 };
@@ -103,56 +122,36 @@ export default FoodScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    paddingTop: 40,
-    paddingHorizontal: 10,
   },
   center: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
-  dayButton: {
-    padding: 10,
-    marginRight: 8,
-    borderRadius: 8,
-    backgroundColor: "#eee",
-  },
-  dayButtonActive: {
-    backgroundColor: "#6c5ce7",
-  },
-  dayText: {
-    fontSize: 16,
-    color: "#333",
-  },
-  dayTextActive: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  dateText: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginVertical: 10,
-    textAlign: "center",
-    color: "#6c5ce7",
-  },
-  mealCard: {
-    backgroundColor: "#f8f8f8",
-    padding: 15,
-    marginVertical: 6,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
+  daySelector: {
+    paddingVertical: 16,
+    paddingHorizontal: 10,
     elevation: 2,
   },
+  dayChip: {
+    marginRight: 8,
+  },
+  dateText: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginVertical: 16,
+    textAlign: "center",
+  },
+  mealCard: {
+    marginVertical: 6,
+    marginHorizontal: 16,
+  },
   mealCategory: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "bold",
-    color: "#2d3436",
+    marginBottom: 4,
   },
   mealFood: {
     fontSize: 14,
-    color: "#636e72",
   },
 });

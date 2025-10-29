@@ -1,13 +1,10 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { initializeAuth, getReactNativePersistence } from "firebase/auth";
+import { getAuth, initializeAuth, getReactNativePersistence, browserLocalPersistence, setPersistence } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyAP8IgU6ppiXyavAVzGvxWqJHL5sUBgEUM",
   authDomain: "revracker.firebaseapp.com",
@@ -18,11 +15,47 @@ const firebaseConfig = {
   measurementId: "G-XH566N5Q16"
 };
 
-// Initialize Firebase
+// Initialize Firebase App
 const app = initializeApp(firebaseConfig);
-const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage),
-});
+
+// Initialize Firebase Auth with platform-specific configuration
+let auth;
+
+try {
+  if (typeof window !== 'undefined' && window.document) {
+    // Web environment - use browser persistence
+    auth = getAuth(app);
+    // Set persistence for web
+    setPersistence(auth, browserLocalPersistence).catch(err => {
+      console.warn('Failed to set browser persistence:', err);
+    });
+  } else {
+    // React Native environment - use AsyncStorage persistence
+    auth = initializeAuth(app, {
+      persistence: getReactNativePersistence(AsyncStorage)
+    });
+  }
+} catch (error) {
+  console.error('Firebase Auth initialization error:', error);
+
+  // Fallback to basic auth initialization
+  if (typeof window !== 'undefined' && window.document) {
+    // Web fallback
+    auth = getAuth(app);
+  } else {
+    // React Native fallback
+    try {
+      auth = initializeAuth(app, {
+        persistence: getReactNativePersistence(AsyncStorage)
+      });
+    } catch (fallbackError) {
+      console.error('Firebase Auth fallback failed:', fallbackError);
+      // Last resort - just get the auth instance
+      auth = getAuth(app);
+    }
+  }
+}
+
 export const db = getFirestore(app);
 export default app;
-export { auth }
+export { auth };

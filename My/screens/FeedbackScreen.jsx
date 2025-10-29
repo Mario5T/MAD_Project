@@ -1,39 +1,40 @@
 import React, { useState, useContext } from "react";
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  StyleSheet, 
+import {
+  View,
+  StyleSheet,
   Alert,
   ScrollView,
-  Image
+  Platform
 } from "react-native";
+import {
+  Text,
+  TextInput,
+  Button,
+  Card,
+  Title,
+  IconButton,
+  useTheme,
+  Surface,
+  Appbar
+} from 'react-native-paper';
 import { AuthContext } from "../context/AuthContext";
 
-const API_URL = "http://10.254.201.15:3000";
-
-const StarRating = ({ rating, setRating }) => {
+const API_URL = "https://mad-backend-5ijo.onrender.com"
+const StarRating = ({ rating, setRating, theme }) => {
   const renderStars = () => {
     const stars = [];
     const maxRating = 5;
     
     for (let i = 1; i <= maxRating; i++) {
       stars.push(
-        <TouchableOpacity
+        <IconButton
           key={i}
+          icon={i <= Number(rating) ? "star" : "star-outline"}
+          size={32}
+          iconColor={i <= Number(rating) ? theme.colors.primary : theme.colors.onSurfaceVariant}
           onPress={() => setRating(i.toString())}
-          style={styles.starContainer}
-        >
-          <Image
-            source={{ 
-              uri: i <= Number(rating) 
-                ? 'https://img.icons8.com/color/48/000000/filled-star.png' 
-                : 'https://img.icons8.com/color/48/000000/star.png' 
-            }}
-            style={styles.starImage}
-          />
-        </TouchableOpacity>
+          style={styles.starButton}
+        />
       );
     }
     
@@ -42,7 +43,7 @@ const StarRating = ({ rating, setRating }) => {
 
   return (
     <View style={styles.ratingContainer}>
-      <Text style={styles.ratingLabel}>Your Rating:</Text>
+      <Text style={[styles.ratingLabel, { color: theme.colors.onSurface }]}>Your Rating:</Text>
       <View style={styles.starsRow}>
         {renderStars()}
       </View>
@@ -52,6 +53,7 @@ const StarRating = ({ rating, setRating }) => {
 
 const FeedbackScreen = ({ navigation }) => {
   const { authState } = useContext(AuthContext);
+  const theme = useTheme();
   const [rating, setRating] = useState("");
   const [comment, setComment] = useState("");
 
@@ -68,7 +70,7 @@ const FeedbackScreen = ({ navigation }) => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/feedback`, {
+      const response = await fetch(`${API_URL}/api/feedback`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -89,81 +91,96 @@ const FeedbackScreen = ({ navigation }) => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Share Your Feedback</Text>
-          <Text style={styles.subtitle}>
-            Help us improve our services by sharing your experience
-          </Text>
-        </View>
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Appbar.Header style={{ backgroundColor: theme.colors.surface }}>
+        <Appbar.BackAction onPress={() => navigation.goBack()} />
+        <Appbar.Content title="Feedback" />
+      </Appbar.Header>
 
-        <StarRating rating={rating} setRating={setRating} />
-        
-        <View style={styles.inputContainer}>
-          <Text style={styles.inputLabel}>Comments</Text>
-          <TextInput
-            style={styles.commentInput}
-            placeholder="Tell us about your experience..."
-            value={comment}
-            onChangeText={setComment}
-            multiline
-            placeholderTextColor="#999"
-          />
-        </View>
-        
-        <TouchableOpacity 
-          style={styles.submitButton} 
-          onPress={handleSubmit}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.submitButtonText}>Submit Feedback</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <Card style={styles.feedbackCard}>
+            <Card.Content>
+              <Title style={[styles.title, { color: theme.colors.primary }]}>Share Your Feedback</Title>
+              <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>
+                Help us improve our services by sharing your experience
+              </Text>
+
+              <StarRating rating={rating} setRating={setRating} theme={theme} />
+
+              <TextInput
+                mode="outlined"
+                label="Comments"
+                placeholder="Tell us about your experience..."
+                value={comment}
+                onChangeText={setComment}
+                multiline
+                numberOfLines={4}
+                style={styles.commentInput}
+              />
+
+              <Button
+                mode="contained"
+                onPress={handleSubmit}
+                style={styles.submitButton}
+                contentStyle={styles.submitButtonContent}
+              >
+                Submit Feedback
+              </Button>
+            </Card.Content>
+          </Card>
+        </ScrollView>
+    </View>
   );
 };
 
 export default FeedbackScreen;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   scrollContainer: {
     flexGrow: 1,
+    padding: 20,
   },
-  container: { 
-    flex: 1, 
-    padding: 20, 
-    backgroundColor: "#f9f9f9",
-  },
-  header: {
+  feedbackCard: {
     marginTop: 20,
-    marginBottom: 30,
-    alignItems: "center",
   },
   title: { 
     fontSize: 24, 
     fontWeight: "bold", 
     marginBottom: 10,
-    color: "#1976D2",
     textAlign: "center",
   },
   subtitle: {
-    fontSize: 14,
-    color: "#757575",
+    fontSize: 16,
     textAlign: "center",
+    marginBottom: 20,
   },
   ratingContainer: {
     marginBottom: 25,
+    alignItems: "center",
   },
   ratingLabel: {
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 10,
-    color: "#333",
   },
   starsRow: {
     flexDirection: "row",
     justifyContent: "center",
+  },
+  starButton: {
+    margin: 0,
+  },
+  commentInput: {
+    marginBottom: 20,
+  },
+  submitButton: {
+    marginTop: 10,
+  },
+  submitButtonContent: {
+    paddingVertical: 8,
     marginVertical: 10,
   },
   starContainer: {

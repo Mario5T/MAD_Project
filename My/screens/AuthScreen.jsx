@@ -12,7 +12,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../context/AuthContext";
 
-const API_URL = "http://10.254.201.15:3000/api/auth";
+const API_URL = "https://mad-backend-5ijo.onrender.com";
 const PRIMARY_COLOR = "#00CED1";
 
 const AuthScreen = ({ navigation }) => {
@@ -64,7 +64,7 @@ const AuthScreen = ({ navigation }) => {
 
       console.log("Sending payload:", JSON.stringify(payload));
 
-      const response = await fetch(`${API_URL}${endpoint}`, {
+      const response = await fetch(`${API_URL}/api/auth${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

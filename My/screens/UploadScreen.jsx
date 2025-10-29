@@ -7,12 +7,13 @@ import {
   ActivityIndicator,
   ScrollView,
   StyleSheet,
+  Platform,
 } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import { AuthContext } from "../context/AuthContext";
 import { LinearGradient } from 'expo-linear-gradient';
 
-const API_URL = "http://10.254.201.15:3000/api/menu";
+const API_URL = "https://mad-backend-5ijo.onrender.com"
 
 const UploadScreen = ({ navigation }) => {
   const { authState } = useContext(AuthContext);
@@ -71,13 +72,14 @@ const UploadScreen = ({ navigation }) => {
     try {
       setLoading(true);
       const formData = new FormData();
+      
       formData.append("menuFile", {
         uri: selectedFile.uri,
         name: selectedFile.name,
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
 
-      const response = await fetch(`${API_URL}/upload`, {
+      const response = await fetch(`${API_URL}/api/menu/upload`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${authState.user?.token}`,
@@ -132,37 +134,37 @@ const UploadScreen = ({ navigation }) => {
           </View>
 
           <TouchableOpacity
-            onPress={pickDocument}
-            disabled={loading}
-            style={[
-              styles.fileSelectionCard,
-              selectedFile ? styles.fileSelectedCard : styles.fileUnselectedCard
-            ]}
-          >
-            <Text style={styles.fileIcon}>
-              {selectedFile ? '📄' : '📁'}
-            </Text>
-            <Text style={[
-              styles.fileSelectionTitle,
-              selectedFile ? styles.fileSelectedTitle : styles.fileUnselectedTitle
-            ]}>
-              {selectedFile ? 'File Selected!' : 'Select Excel File'}
-            </Text>
-            <Text style={styles.fileSelectionSubtitle}>
-              {selectedFile ? 'Tap to change file' : 'Tap to browse files'}
-            </Text>
-          </TouchableOpacity>
+                onPress={pickDocument}
+                disabled={loading}
+                style={[
+                  styles.fileSelectionCard,
+                  selectedFile ? styles.fileSelectedCard : styles.fileUnselectedCard
+                ]}
+              >
+                <Text style={styles.fileIcon}>
+                  {selectedFile ? '📄' : '📁'}
+                </Text>
+                <Text style={[
+                  styles.fileSelectionTitle,
+                  selectedFile ? styles.fileSelectedTitle : styles.fileUnselectedTitle
+                ]}>
+                  {selectedFile ? 'File Selected!' : 'Select Excel File'}
+                </Text>
+                <Text style={styles.fileSelectionSubtitle}>
+                  {selectedFile ? 'Tap to change file' : 'Tap to browse files'}
+                </Text>
+              </TouchableOpacity>
 
-          {selectedFile && (
-            <View style={styles.fileInfoCard}>
-              <Text style={styles.fileInfoTitle}>
-                📎 {selectedFile.name}
-              </Text>
-              <Text style={styles.fileInfoSize}>
-                Size: {Math.round(selectedFile.size / 1024)} KB
-              </Text>
-            </View>
-          )}
+              {selectedFile && (
+                <View style={styles.fileInfoCard}>
+                  <Text style={styles.fileInfoTitle}>
+                    📎 {selectedFile.name}
+                  </Text>
+                  <Text style={styles.fileInfoSize}>
+                    Size: {Math.round(selectedFile.size / 1024)} KB
+                  </Text>
+                </View>
+              )}
 
           <TouchableOpacity
             onPress={uploadFile}

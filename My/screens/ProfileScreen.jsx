@@ -1,21 +1,22 @@
 import React, { useState, useEffect, useContext } from "react";
 import {
   View,
-  Text,
   TouchableOpacity,
   StyleSheet,
   Alert,
   ScrollView,
   Image,
   RefreshControl,
+  Platform,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../context/AuthContext";
+import { Button, Card, Surface, useTheme, Text, Appbar } from 'react-native-paper';
 
-const API_URL = "http://10.254.201.15:3000/api/auth";
-
+const API_URL = "https://mad-backend-5ijo.onrender.com"
 const ProfileScreen = ({ navigation }) => {
   const { authState, setAuthState } = useContext(AuthContext);
+  const theme = useTheme();
   const [userData, setUserData] = useState(null);
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +35,7 @@ const ProfileScreen = ({ navigation }) => {
         return;
       }
 
-      const response = await fetch(`${API_URL}/profile`, {
+      const response = await fetch(`${API_URL}/api/auth/profile`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -56,7 +57,7 @@ const ProfileScreen = ({ navigation }) => {
   const fetchUserSessions = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      const response = await fetch(`${API_URL}/sessions`, {
+      const response = await fetch(`${API_URL}/api/auth/sessions`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -103,7 +104,7 @@ const ProfileScreen = ({ navigation }) => {
   if (loading) {
     return (
       <View style={styles.center}>
-        <Text>Loading profile...</Text>
+        <Text style={styles.loadingText}>Loading profile...</Text>
       </View>
     );
   }
@@ -111,7 +112,7 @@ const ProfileScreen = ({ navigation }) => {
   if (!userData) {
     return (
       <View style={styles.center}>
-        <Text>Unable to load profile</Text>
+        <Text style={styles.errorText}>Unable to load profile</Text>
         <TouchableOpacity style={styles.retryButton} onPress={fetchUserProfile}>
           <Text style={styles.retryButtonText}>Retry</Text>
         </TouchableOpacity>
@@ -120,241 +121,223 @@ const ProfileScreen = ({ navigation }) => {
   }
 
   return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backButtonText}>← Back</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Profile</Text>
-        <View style={styles.placeholder} />
-      </View>
-      <View style={styles.profileSection}>
-        <View style={styles.avatarContainer}>
-          <Image
-            source={{ uri: 'https://img.icons8.com/ios-filled/100/00CED1/user.png' }}
-            style={styles.avatar}
-          />
+    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Appbar.Header style={{ backgroundColor: theme.colors.surface }}>
+        <Appbar.BackAction onPress={() => navigation.goBack()} />
+        <Appbar.Content title="Profile" />
+      </Appbar.Header>
+      
+      <ScrollView
+        style={styles.scrollContainer}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <Surface style={[styles.profileSection, { backgroundColor: theme.colors.surface }]} elevation={2}>
+          <View style={styles.avatarContainer}>
+            <Image
+              source={{ uri: 'https://img.icons8.com/ios-filled/100/00CED1/user.png' }}
+              style={[styles.avatar, { borderColor: theme.colors.primary }]}
+            />
+          </View>
+          <View style={styles.infoContainer}>
+            <Text style={[styles.name, { color: theme.colors.onSurface }]}>{userData.name}</Text>
+            <Text style={[styles.role, { color: theme.colors.primary }]}>Role: {userData.role}</Text>
+            <Text style={[styles.email, { color: theme.colors.onSurfaceVariant }]}>
+              {userData.email || userData.phone}
+            </Text>
+          </View>
+        </Surface>
+
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>Active Sessions</Text>
+          {sessions.length > 0 ? (
+            sessions.map((session, index) => (
+              <Card key={index} style={styles.sessionItem}>
+                <Card.Content>
+                  <Text style={[styles.sessionInfo, { color: theme.colors.onSurfaceVariant }]}>
+                    Device: {session.device || "Unknown"}
+                  </Text>
+                  <Text style={[styles.sessionInfo, { color: theme.colors.onSurfaceVariant }]}>
+                    Last Active: {formatDate(session.lastActive)}
+                  </Text>
+                  <Text style={[styles.sessionInfo, { color: theme.colors.onSurfaceVariant }]}>
+                    IP: {session.ip || "Unknown"}
+                  </Text>
+                </Card.Content>
+              </Card>
+            ))
+          ) : (
+            <Text style={[styles.noSessions, { color: theme.colors.onSurfaceVariant }]}>No active sessions found</Text>
+          )}
         </View>
 
-        <View style={styles.infoContainer}>
-          <Text style={styles.name}>{userData.name}</Text>
-          <Text style={styles.role}>Role: {userData.role}</Text>
-          <Text style={styles.email}>
-            {userData.email || userData.phone}
-          </Text>
-        </View>
-      </View>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Active Sessions</Text>
-        {sessions.length > 0 ? (
-          sessions.map((session, index) => (
-            <View key={index} style={styles.sessionItem}>
-              <Text style={styles.sessionInfo}>
-                Device: {session.device || "Unknown"}
-              </Text>
-              <Text style={styles.sessionInfo}>
-                Last Active: {formatDate(session.lastActive)}
-              </Text>
-              <Text style={styles.sessionInfo}>
-                IP: {session.ip || "Unknown"}
-              </Text>
-            </View>
-          ))
-        ) : (
-          <Text style={styles.noSessions}>No active sessions found</Text>
-        )}
-      </View>
-      <View style={styles.section}>
-        <TouchableOpacity style={styles.actionButton} onPress={onRefresh}>
-          <Text style={styles.actionButtonText}>Refresh Data</Text>
-        </TouchableOpacity>
+        <View style={styles.section}>
+          <Button
+            mode="contained"
+            onPress={onRefresh}
+            style={[styles.actionButton, { backgroundColor: theme.colors.primary }]}
+            contentStyle={styles.actionButtonContent}
+          >
+            Refresh Data
+          </Button>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>Logout</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Account Information</Text>
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>Member Since:</Text>
-          <Text style={styles.infoValue}>
-            {new Date(userData.createdAt).toLocaleDateString()}
-          </Text>
+          <Button
+            mode="contained"
+            onPress={handleLogout}
+            style={[styles.logoutButton, { backgroundColor: theme.colors.error }]}
+            contentStyle={styles.logoutButtonContent}
+          >
+            Logout
+          </Button>
         </View>
-        <View style={styles.infoItem}>
-          <Text style={styles.infoLabel}>User ID:</Text>
-          <Text style={styles.infoValue}>{userData.id}</Text>
+
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>Account Information</Text>
+          <Card>
+            <Card.Content>
+              <View style={[styles.infoItem, { borderBottomColor: theme.colors.outline }]}>
+                <Text style={[styles.infoLabel, { color: theme.colors.onSurfaceVariant }]}>Member Since:</Text>
+                <Text style={[styles.infoValue, { color: theme.colors.onSurface }]}>
+                  {new Date(userData.createdAt).toLocaleDateString()}
+                </Text>
+              </View>
+              <View style={[styles.infoItem, { borderBottomColor: theme.colors.outline }]}>
+                <Text style={[styles.infoLabel, { color: theme.colors.onSurfaceVariant }]}>User ID:</Text>
+                <Text style={[styles.infoValue, { color: theme.colors.onSurface }]}>{userData.id}</Text>
+              </View>
+            </Card.Content>
+          </Card>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#f5f5f5", // Use static color for StyleSheet
   },
   center: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 20,
-    backgroundColor: "#fff",
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  backButton: {
-    padding: 5,
-  },
-  backButtonText: {
-    color: "#00CED1",
-    fontSize: 16,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  placeholder: {
-    width: 50,
+    backgroundColor: "#f5f5f5", // Use static color for StyleSheet
   },
   profileSection: {
-    backgroundColor: "#fff",
     padding: 20,
-    margin: 15,
-    borderRadius: 10,
+    margin: 16,
+    borderRadius: 12,
     alignItems: "center",
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
   avatarContainer: {
-    marginBottom: 15,
+    marginBottom: 16,
   },
   avatar: {
     width: 80,
     height: 80,
     borderRadius: 40,
+    borderWidth: 3,
+    borderColor: "#00CED1", // Use static color for StyleSheet
   },
   infoContainer: {
     alignItems: "center",
   },
   name: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 5,
+    color: "#333", // Use static color for StyleSheet
   },
   role: {
-    fontSize: 16,
-    color: "#00CED1",
-    marginBottom: 5,
+    color: "#00CED1", // Use static color for StyleSheet
     textTransform: "capitalize",
   },
   email: {
-    fontSize: 14,
-    color: "#666",
-  },
-  section: {
-    backgroundColor: "#fff",
-    margin: 15,
-    marginTop: 0,
-    padding: 15,
-    borderRadius: 10,
-    elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 15,
+    color: "#666", // Use static color for StyleSheet
   },
   sessionItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    marginBottom: 12,
+    borderRadius: 8,
   },
   sessionInfo: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 2,
+    color: "#666", // Use static color for StyleSheet
+    marginBottom: 4,
   },
   noSessions: {
-    fontSize: 14,
-    color: "#999",
+    color: "#999", // Use static color for StyleSheet
     fontStyle: "italic",
     textAlign: "center",
+    paddingVertical: 24,
   },
   actionButton: {
-    backgroundColor: "#00CED1",
-    padding: 15,
+    marginBottom: 12,
     borderRadius: 8,
-    alignItems: "center",
-    marginBottom: 10,
   },
-  actionButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
+  actionButtonContent: {
+    paddingVertical: 8,
   },
   logoutButton: {
-    backgroundColor: "#e74c3c",
-    padding: 15,
     borderRadius: 8,
-    alignItems: "center",
   },
-  logoutButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
+  logoutButtonContent: {
+    paddingVertical: 8,
   },
   infoItem: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 8,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: "#eee", // Use static color for StyleSheet
   },
   infoLabel: {
-    fontSize: 14,
-    color: "#666",
+    color: "#666", // Use static color for StyleSheet
     fontWeight: "500",
   },
   infoValue: {
-    fontSize: 14,
-    color: "#333",
+    color: "#333", // Use static color for StyleSheet
+    fontWeight: "600",
   },
   retryButton: {
-    backgroundColor: "#00CED1",
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 10,
+    backgroundColor: "#00CED1", // Use static color for StyleSheet
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginTop: 16,
   },
   retryButtonText: {
     color: "#fff",
+    fontWeight: "600",
+  },
+  scrollContainer: {
+    flex: 1,
+  },
+  section: {
+    padding: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 12,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: "#666",
+  },
+  errorText: {
+    fontSize: 16,
+    color: "#e74c3c",
+    marginBottom: 16,
+  },
+  name: {
+    fontSize: 20,
+    fontWeight: "600",
+    marginBottom: 4,
+  },
+  role: {
+    fontSize: 16,
+    marginBottom: 4,
+    textTransform: "capitalize",
+  },
+  email: {
     fontSize: 14,
   },
 });
