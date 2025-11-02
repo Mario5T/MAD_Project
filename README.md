@@ -1,3 +1,6 @@
+[![Expo Build](https://img.shields.io/badge/Expo-Build-blue?logo=expo)](https://expo.dev/accounts/aditya5t/projects/revracker/builds/ae04fb23-bc9b-4c5a-8262-02c914116cb4)
+
+
 # 🚀 Contributing  
 
 If you’d like to contribute:  
