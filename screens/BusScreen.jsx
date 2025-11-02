@@ -43,6 +43,7 @@ const BusScreen = ({ navigation }) => {
   const [registeredDrivers, setRegisteredDrivers] = useState([]);
   const [driversLoading, setDriversLoading] = useState(true);
   const [driversError, setDriversError] = useState(null);
+  const [mapError, setMapError] = useState(false);
 
   // Request location permissions and start tracking (only for drivers)
   useEffect(() => {
@@ -246,31 +247,52 @@ const BusScreen = ({ navigation }) => {
           )}
         />
         <Card.Content>
-          <Surface style={styles.mapContainer} elevation={1}>
-            <PlatformMapView
-              style={styles.map}
-              region={{
-                latitude: driverLocation.latitude,
-                longitude: driverLocation.longitude,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-              }}
-              showsUserLocation={isDriver && locationPermission}
-              showsMyLocationButton={isDriver && locationPermission}
-              followsUserLocation={isDriver && isTracking}
-            >
-              <PlatformMarker 
-                coordinate={driverLocation} 
-                title={isDriver ? "Your Location" : "Driver Location"}
-                description={
-                  isDriver 
-                    ? (isTracking ? "Live location" : "Last known location")
-                    : "Driver's current location"
-                }
-                pinColor={isDriver ? "#4CAF50" : theme.colors.primary}
-              />
-            </PlatformMapView>
-          </Surface>
+          {mapError ? (
+            <Surface style={[styles.mapContainer, styles.mapErrorContainer]} elevation={1}>
+              <IconButton icon="map-marker-off" size={40} iconColor={theme.colors.error} />
+              <Text style={{ color: theme.colors.onSurface, marginTop: 8 }}>Map unavailable</Text>
+              <Text style={{ color: theme.colors.onSurfaceVariant, fontSize: 12, marginTop: 4 }}>
+                Location: {driverLocation.latitude.toFixed(4)}, {driverLocation.longitude.toFixed(4)}
+              </Text>
+            </Surface>
+          ) : (
+            <Surface style={styles.mapContainer} elevation={1}>
+              {Platform.OS === 'web' ? (
+                <View style={styles.mapPlaceholder}>
+                  <IconButton icon="map" size={40} iconColor={theme.colors.primary} />
+                  <Text style={{ color: theme.colors.onSurface }}>Map View</Text>
+                  <Text style={{ color: theme.colors.onSurfaceVariant, fontSize: 12 }}>
+                    Lat: {driverLocation.latitude.toFixed(4)}, Lng: {driverLocation.longitude.toFixed(4)}
+                  </Text>
+                </View>
+              ) : (
+                <PlatformMapView
+                  style={styles.map}
+                  region={{
+                    latitude: driverLocation.latitude,
+                    longitude: driverLocation.longitude,
+                    latitudeDelta: 0.01,
+                    longitudeDelta: 0.01,
+                  }}
+                  showsUserLocation={isDriver && locationPermission}
+                  showsMyLocationButton={isDriver && locationPermission}
+                  followsUserLocation={isDriver && isTracking}
+                  onError={() => setMapError(true)}
+                >
+                  <PlatformMarker 
+                    coordinate={driverLocation} 
+                    title={isDriver ? "Your Location" : "Driver Location"}
+                    description={
+                      isDriver 
+                        ? (isTracking ? "Live location" : "Last known location")
+                        : "Driver's current location"
+                    }
+                    pinColor={isDriver ? "#4CAF50" : theme.colors.primary}
+                  />
+                </PlatformMapView>
+              )}
+            </Surface>
+          )}
         </Card.Content>
       </Card>
 
@@ -444,15 +466,11 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   map: {
-    height: 250,
+    height: 200,
     width: '100%',
   },
-  driversCard: {
-    marginBottom: 20,
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  driverItem: {
+  mapErrorContainer: {
+    justifyContent: 'center',
     padding: 12,
     borderRadius: 8,
     marginVertical: 4,
