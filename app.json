@@ -41,12 +41,6 @@
         {
           "locationAlwaysAndWhenInUsePermission": "This app needs access to location when open and in the background."
         }
-      ],
-      [
-        "react-native-maps",
-        {
-          "googleMapsApiKey": ""
-        }
       ]
     ],
     "owner": "aditya5t",
