@@ -11,15 +11,12 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../context/AuthContext";
-import { ThemeContext } from '../context/ThemeContext';
-import { Button, Card, Surface, useTheme, Text, Appbar, IconButton } from 'react-native-paper';
-import { LinearGradient } from 'expo-linear-gradient';
+import { Button, Card, Surface, useTheme, Text, Appbar } from 'react-native-paper';
 
 const API_URL = "https://mad-backend-5ijo.onrender.com"
 const ProfileScreen = ({ navigation }) => {
   const { authState, setAuthState } = useContext(AuthContext);
   const theme = useTheme();
-  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const [userData, setUserData] = useState(null);
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -125,30 +122,10 @@ const ProfileScreen = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <LinearGradient
-        colors={isDarkMode ? ['#1e3a5f', '#2c5282'] : ['#0056b3', '#0088ff']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={styles.header}
-      >
-        <View style={styles.headerContent}>
-          <IconButton
-            icon="arrow-left"
-            iconColor="#ffffff"
-            size={24}
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          />
-          <Text style={styles.headerTitle}>Profile</Text>
-          <IconButton
-            icon={isDarkMode ? "weather-sunny" : "weather-night"}
-            iconColor="#ffffff"
-            size={24}
-            onPress={toggleTheme}
-            style={styles.themeButton}
-          />
-        </View>
-      </LinearGradient>
+      <Appbar.Header style={{ backgroundColor: theme.colors.surface }}>
+        <Appbar.BackAction onPress={() => navigation.goBack()} />
+        <Appbar.Content title="Profile" />
+      </Appbar.Header>
       
       <ScrollView
         style={styles.scrollContainer}
@@ -240,29 +217,7 @@ const ProfileScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    paddingTop: 50,
-    paddingBottom: 16,
-    paddingHorizontal: 16,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    flex: 1,
-    textAlign: 'center',
-  },
-  backButton: {
-    margin: 0,
-  },
-  themeButton: {
-    margin: 0,
+    backgroundColor: "#f5f5f5", // Use static color for StyleSheet
   },
   center: {
     flex: 1,
@@ -272,9 +227,8 @@ const styles = StyleSheet.create({
   },
   profileSection: {
     padding: 20,
-    margin: 20,
-    marginTop: 20,
-    borderRadius: 16,
+    margin: 16,
+    borderRadius: 12,
     alignItems: "center",
   },
   avatarContainer: {
@@ -290,9 +244,19 @@ const styles = StyleSheet.create({
   infoContainer: {
     alignItems: "center",
   },
+  name: {
+    color: "#333", // Use static color for StyleSheet
+  },
+  role: {
+    color: "#00CED1", // Use static color for StyleSheet
+    textTransform: "capitalize",
+  },
+  email: {
+    color: "#666", // Use static color for StyleSheet
+  },
   sessionItem: {
     marginBottom: 12,
-    borderRadius: 12,
+    borderRadius: 8,
   },
   sessionInfo: {
     color: "#666", // Use static color for StyleSheet
@@ -306,13 +270,13 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     marginBottom: 12,
-    borderRadius: 12,
+    borderRadius: 8,
   },
   actionButtonContent: {
     paddingVertical: 8,
   },
   logoutButton: {
-    borderRadius: 12,
+    borderRadius: 8,
   },
   logoutButtonContent: {
     paddingVertical: 8,
@@ -347,8 +311,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   section: {
-    padding: 20,
-    paddingBottom: 10,
+    padding: 16,
   },
   sectionTitle: {
     fontSize: 18,
@@ -368,17 +331,14 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "600",
     marginBottom: 4,
-    color: "#333",
   },
   role: {
     fontSize: 16,
     marginBottom: 4,
     textTransform: "capitalize",
-    color: "#00CED1",
   },
   email: {
     fontSize: 14,
-    color: "#666",
   },
 });
 

@@ -12,19 +12,17 @@ import {
   Card, 
   useTheme,
   Surface,
-  IconButton,
+  Appbar,
 } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { AuthContext } from "../context/AuthContext";
-import { ThemeContext } from '../context/ThemeContext';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const { width } = Dimensions.get('window'); 
+const { width } = Dimensions.get('window');
 
 const HomeScreen = ({ navigation }) => {
   const { authState } = useContext(AuthContext);
   const theme = useTheme();
-  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
 
   const isLoggedIn = authState.isLoggedIn;
   const userRole = authState.user?.role;
@@ -87,43 +85,35 @@ const HomeScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar style={isDarkMode ? "light" : "dark"} />
+    <View style={[styles.container, { backgroundColor: '#f8f9fa' }]}>
+      <StatusBar style="dark" />
       
       {/* Header */}
       <LinearGradient
-        colors={isDarkMode ? ['#1e3a5f', '#2c5282'] : ['#0056b3', '#0088ff']}
+        colors={['#0056b3', '#0088ff']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.header}
       >
         <View style={styles.headerContent}>
           <View>
-            <Text style={styles.userName}>RevRacker</Text>
+            <Text style={styles.welcomeText}>Welcome back,</Text>
+            <Text style={styles.userName}>{userName}!</Text>
           </View>
-          <View style={styles.headerActions}>
-            <IconButton
-              icon={isDarkMode ? "weather-sunny" : "weather-night"}
-              iconColor="#ffffff"
-              size={24}
-              onPress={toggleTheme}
-              style={styles.themeButton}
-            />
-            {isLoggedIn && (
-              <TouchableOpacity 
-                style={styles.profileButton}
-                onPress={() => navigation.navigate('Profile')}
-              >
-                <Icon name="account-circle" size={40} color="#ffffff" />
-              </TouchableOpacity>
-            )}
-          </View>
+          {isLoggedIn && (
+            <TouchableOpacity 
+              style={styles.profileButton}
+              onPress={() => navigation.navigate('Profile')}
+            >
+              <Icon name="account-circle" size={40} color="#ffffff" />
+            </TouchableOpacity>
+          )}
         </View>
         <Text style={styles.subtitle}>
           Access all campus services from one convenient dashboard
         </Text>
       </LinearGradient>
-      
+
       {/* Cards Grid */}
       <ScrollView 
         style={styles.scrollView}
@@ -137,7 +127,7 @@ const HomeScreen = ({ navigation }) => {
             onPress={() => handleCardPress(card)}
             style={styles.cardWrapper}
           >
-            <Card style={[styles.card, { backgroundColor: theme.colors.surface }]} mode="elevated">
+            <Card style={styles.card} mode="elevated">
               {/* Top accent line */}
               <LinearGradient
                 colors={card.colors}
@@ -153,37 +143,37 @@ const HomeScreen = ({ navigation }) => {
                 </View>
 
                 {/* Card Text */}
-                <Text style={[styles.cardTitle, { color: theme.colors.onSurface }]}>{card.title}</Text>
-                <Text style={[styles.cardDescription, { color: theme.colors.onSurfaceVariant }]}>{card.description}</Text>
+                <Text style={styles.cardTitle}>{card.title}</Text>
+                <Text style={styles.cardDescription}>{card.description}</Text>
               </Card.Content>
             </Card>
           </TouchableOpacity>
         ))}
       </ScrollView>
-      
+
       {/* Bottom Navigation */}
-      <Surface style={[styles.bottomNav, { backgroundColor: theme.colors.surface }]} elevation={4}>
+      <Surface style={styles.bottomNav} elevation={4}>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Home')}>
-          <Icon name="home" size={24} color={theme.colors.primary} />
-          <Text style={[styles.navText, { color: theme.colors.primary }]}>Home</Text>
+          <Icon name="home" size={24} color="#0056b3" />
+          <Text style={[styles.navText, { color: '#0056b3' }]}>Home</Text>
         </TouchableOpacity>
         
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Food')}>
-          <Icon name="silverware-fork-knife" size={24} color={theme.colors.onSurfaceVariant} />
-          <Text style={[styles.navText, { color: theme.colors.onSurfaceVariant }]}>Menu</Text>
+          <Icon name="silverware-fork-knife" size={24} color="#5f6368" />
+          <Text style={styles.navText}>Menu</Text>
         </TouchableOpacity>
         
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Bus')}>
-          <Icon name="bus" size={24} color={theme.colors.onSurfaceVariant} />
-          <Text style={[styles.navText, { color: theme.colors.onSurfaceVariant }]}>Shuttle</Text>
+          <Icon name="bus" size={24} color="#5f6368" />
+          <Text style={styles.navText}>Shuttle</Text>
         </TouchableOpacity>
         
         <TouchableOpacity 
           style={styles.navItem} 
           onPress={() => isLoggedIn ? navigation.navigate('Profile') : navigation.navigate('Auth')}
         >
-          <Icon name="account" size={24} color={theme.colors.onSurfaceVariant} />
-          <Text style={[styles.navText, { color: theme.colors.onSurfaceVariant }]}>Profile</Text>
+          <Icon name="account" size={24} color="#5f6368" />
+          <Text style={styles.navText}>Profile</Text>
         </TouchableOpacity>
       </Surface>
     </View>
@@ -218,14 +208,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginTop: 4,
   },
-  headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  themeButton: {
-    margin: 0,
-  },
   profileButton: {
     width: 48,
     height: 48,
@@ -252,6 +234,7 @@ const styles = StyleSheet.create({
   },
   card: {
     borderRadius: 16,
+    backgroundColor: '#ffffff',
     overflow: 'hidden',
   },
   cardAccent: {
@@ -272,10 +255,12 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 20,
     fontWeight: '600',
+    color: '#212121',
     marginBottom: 8,
   },
   cardDescription: {
     fontSize: 14,
+    color: '#5f6368',
     lineHeight: 20,
   },
   bottomNav: {
@@ -287,6 +272,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     paddingVertical: 12,
     paddingBottom: 20,
+    backgroundColor: '#ffffff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
@@ -297,6 +283,7 @@ const styles = StyleSheet.create({
   },
   navText: {
     fontSize: 12,
+    color: '#5f6368',
     marginTop: 4,
     fontWeight: '500',
   },

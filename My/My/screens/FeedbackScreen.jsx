@@ -17,9 +17,7 @@ import {
   Surface,
   Appbar
 } from 'react-native-paper';
-import { LinearGradient } from 'expo-linear-gradient';
 import { AuthContext } from "../context/AuthContext";
-import { ThemeContext } from '../context/ThemeContext';
 
 const API_URL = "https://mad-backend-5ijo.onrender.com"
 const StarRating = ({ rating, setRating, theme }) => {
@@ -56,7 +54,6 @@ const StarRating = ({ rating, setRating, theme }) => {
 const FeedbackScreen = ({ navigation }) => {
   const { authState } = useContext(AuthContext);
   const theme = useTheme();
-  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const [rating, setRating] = useState("");
   const [comment, setComment] = useState("");
 
@@ -95,30 +92,10 @@ const FeedbackScreen = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <LinearGradient
-        colors={isDarkMode ? ['#1e3a5f', '#2c5282'] : ['#0056b3', '#0088ff']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={styles.header}
-      >
-        <View style={styles.headerContent}>
-          <IconButton
-            icon="arrow-left"
-            iconColor="#ffffff"
-            size={24}
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          />
-          <Text style={styles.headerTitle}>Feedback</Text>
-          <IconButton
-            icon={isDarkMode ? "weather-sunny" : "weather-night"}
-            iconColor="#ffffff"
-            size={24}
-            onPress={toggleTheme}
-            style={styles.themeButton}
-          />
-        </View>
-      </LinearGradient>
+      <Appbar.Header style={{ backgroundColor: theme.colors.surface }}>
+        <Appbar.BackAction onPress={() => navigation.goBack()} />
+        <Appbar.Content title="Feedback" />
+      </Appbar.Header>
 
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <Card style={styles.feedbackCard}>
@@ -162,38 +139,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  header: {
-    paddingTop: 50,
-    paddingBottom: 16,
-    paddingHorizontal: 16,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    flex: 1,
-    textAlign: 'center',
-  },
-  backButton: {
-    margin: 0,
-  },
-  themeButton: {
-    margin: 0,
-  },
   scrollContainer: {
     flexGrow: 1,
     padding: 20,
-    paddingBottom: 40,
   },
   feedbackCard: {
     marginTop: 20,
-    borderRadius: 16,
-    overflow: 'hidden',
   },
   title: { 
     fontSize: 24, 
@@ -227,9 +178,56 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     marginTop: 10,
-    borderRadius: 12,
   },
   submitButtonContent: {
     paddingVertical: 8,
+    marginVertical: 10,
+  },
+  starContainer: {
+    padding: 5,
+  },
+  starImage: {
+    width: 40,
+    height: 40,
+  },
+  inputContainer: {
+    marginBottom: 25,
+  },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 10,
+    color: "#333",
+  },
+  commentInput: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 15,
+    height: 120,
+    textAlignVertical: "top",
+    fontSize: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  submitButton: {
+    backgroundColor: "#1976D2",
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  submitButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

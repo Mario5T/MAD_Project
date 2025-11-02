@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
-import { View, FlatList, StyleSheet, Platform, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, FlatList, StyleSheet, Platform } from "react-native";
 import {
   Text,
   Card,
@@ -8,16 +8,12 @@ import {
   ActivityIndicator,
   useTheme,
   Surface,
-  Appbar,
-  IconButton
+  Appbar
 } from 'react-native-paper';
-import { LinearGradient } from 'expo-linear-gradient';
-import { ThemeContext } from '../context/ThemeContext';
 
 const API_URL = "https://mad-backend-5ijo.onrender.com"
 const FoodScreen = ({ navigation }) => {
   const theme = useTheme();
-  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const [menuData, setMenuData] = useState(null);
   const [days, setDays] = useState([]);
   const [selectedDay, setSelectedDay] = useState(null);
@@ -69,37 +65,12 @@ const FoodScreen = ({ navigation }) => {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <LinearGradient
-        colors={isDarkMode ? ['#1e3a5f', '#2c5282'] : ['#0056b3', '#0088ff']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={styles.header}
-      >
-        <View style={styles.headerContent}>
-          <IconButton
-            icon="arrow-left"
-            iconColor="#ffffff"
-            size={24}
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          />
-          <Text style={styles.headerTitle}>Food Menu</Text>
-          <IconButton
-            icon={isDarkMode ? "weather-sunny" : "weather-night"}
-            iconColor="#ffffff"
-            size={24}
-            onPress={toggleTheme}
-            style={styles.themeButton}
-          />
-        </View>
-      </LinearGradient>
+      <Appbar.Header style={{ backgroundColor: theme.colors.surface }}>
+        <Appbar.BackAction onPress={() => navigation.goBack()} />
+        <Appbar.Content title="Food Menu" />
+      </Appbar.Header>
 
-      <ScrollView 
-        style={styles.scrollView}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        <Surface style={styles.daySelector} elevation={2}>
+        <Surface style={styles.daySelector}>
           <FlatList
             data={days}
             horizontal
@@ -119,27 +90,29 @@ const FoodScreen = ({ navigation }) => {
           />
         </Surface>
 
-        <Card style={styles.dateCard} mode="elevated">
-          <Card.Content>
-            <Title style={[styles.dateText, { color: theme.colors.primary }]}>
-              📅 {menuData[selectedDay].date}
-            </Title>
-          </Card.Content>
-        </Card>
+        <Title style={[styles.dateText, { color: theme.colors.primary }]}>
+          {menuData[selectedDay].date}
+        </Title>
 
-        {Object.entries(meals).map(([category, food]) => (
-          <Card key={category} style={styles.mealCard} mode="elevated">
-            <Card.Content>
-              <Title style={[styles.mealCategory, { color: theme.colors.onSurface }]}>
-                {category}
-              </Title>
-              <Text style={[styles.mealFood, { color: theme.colors.onSurfaceVariant }]}>
-                {food}
-              </Text>
-            </Card.Content>
-          </Card>
-        ))}
-      </ScrollView>
+        <FlatList
+          data={Object.entries(meals)}
+          keyExtractor={([category]) => category}
+          renderItem={({ item }) => {
+            const [category, food] = item;
+            return (
+              <Card style={styles.mealCard} mode="elevated">
+                <Card.Content>
+                  <Title style={[styles.mealCategory, { color: theme.colors.onSurface }]}>
+                    {category}
+                  </Title>
+                  <Text style={[styles.mealFood, { color: theme.colors.onSurfaceVariant }]}>
+                    {food}
+                  </Text>
+                </Card.Content>
+              </Card>
+            );
+          }}
+        />
     </View>
   );
 };
@@ -155,59 +128,23 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  header: {
-    paddingTop: 50,
-    paddingBottom: 16,
-    paddingHorizontal: 16,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    flex: 1,
-    textAlign: 'center',
-  },
-  backButton: {
-    margin: 0,
-  },
-  themeButton: {
-    margin: 0,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  contentContainer: {
-    padding: 20,
-    paddingBottom: 40,
-  },
   daySelector: {
     paddingVertical: 16,
     paddingHorizontal: 10,
-    borderRadius: 12,
-    marginBottom: 16,
+    elevation: 2,
   },
   dayChip: {
     marginRight: 8,
   },
-  dateCard: {
-    marginBottom: 16,
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
   dateText: {
     fontSize: 18,
     fontWeight: "600",
+    marginVertical: 16,
     textAlign: "center",
   },
   mealCard: {
-    marginBottom: 16,
-    borderRadius: 16,
-    overflow: 'hidden',
+    marginVertical: 6,
+    marginHorizontal: 16,
   },
   mealCategory: {
     fontSize: 16,

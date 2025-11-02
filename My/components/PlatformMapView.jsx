@@ -1,2 +1,3 @@
-// This file will be automatically resolved to .web.jsx or .native.jsx based on platform
-export { PlatformMapView, PlatformMarker } from './PlatformMapView.native';
+// Platform-agnostic map view component
+export { default as PlatformMapView } from './PlatformMapView.native';
+export { default as PlatformMarker } from './PlatformMapView.native';

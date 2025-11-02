@@ -14,16 +14,13 @@ import {
   Banner,
   Appbar
 } from "react-native-paper";
-import { LinearGradient } from 'expo-linear-gradient';
 import { PlatformMapView, PlatformMarker } from "../components/PlatformMapView";
 import { requestLocationPermission, getCurrentPosition, watchPosition } from "../utils/locationUtils";
 import { AuthContext } from "../context/AuthContext";
-import { ThemeContext } from '../context/ThemeContext';
 
 const BusScreen = ({ navigation }) => {
   const { authState } = useContext(AuthContext);
   const theme = useTheme();
-  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const isDriver = authState?.user?.role === 'driver';
   
   const schedule = [
@@ -43,7 +40,6 @@ const BusScreen = ({ navigation }) => {
   const [registeredDrivers, setRegisteredDrivers] = useState([]);
   const [driversLoading, setDriversLoading] = useState(true);
   const [driversError, setDriversError] = useState(null);
-  const [mapError, setMapError] = useState(false);
 
   // Request location permissions and start tracking (only for drivers)
   useEffect(() => {
@@ -153,33 +149,20 @@ const BusScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <LinearGradient
-        colors={isDarkMode ? ['#1e3a5f', '#2c5282'] : ['#0056b3', '#0088ff']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={styles.header}
-      >
-        <View style={styles.headerContent}>
-          <IconButton
-            icon="arrow-left"
-            iconColor="#ffffff"
-            size={24}
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          />
-          <Text style={styles.headerTitle}>Campus Shuttle</Text>
-          <IconButton
-            icon={isDarkMode ? "weather-sunny" : "weather-night"}
-            iconColor="#ffffff"
-            size={24}
-            onPress={toggleTheme}
-            style={styles.themeButton}
-          />
-        </View>
-      </LinearGradient>
+    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+      <Appbar.Header style={{ backgroundColor: theme.colors.surface }}>
+        <Appbar.BackAction onPress={() => navigation.goBack()} />
+        <Appbar.Content title="Campus Shuttle" />
+      </Appbar.Header>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        {/* Header */}
+        <Surface style={styles.headerSurface} elevation={2}>
+          <Title style={[styles.title, { color: theme.colors.primary }]}>
+            🚌 Campus Shuttle
+          </Title>
+          <Paragraph style={styles.subtitle}>Real-time tracking & schedules</Paragraph>
+        </Surface>
+
       {/* Schedule Card */}
       <Card style={styles.scheduleCard} elevation={3}>
         <Card.Title 
@@ -247,52 +230,31 @@ const BusScreen = ({ navigation }) => {
           )}
         />
         <Card.Content>
-          {mapError ? (
-            <Surface style={[styles.mapContainer, styles.mapErrorContainer]} elevation={1}>
-              <IconButton icon="map-marker-off" size={40} iconColor={theme.colors.error} />
-              <Text style={{ color: theme.colors.onSurface, marginTop: 8 }}>Map unavailable</Text>
-              <Text style={{ color: theme.colors.onSurfaceVariant, fontSize: 12, marginTop: 4 }}>
-                Location: {driverLocation.latitude.toFixed(4)}, {driverLocation.longitude.toFixed(4)}
-              </Text>
-            </Surface>
-          ) : (
-            <Surface style={styles.mapContainer} elevation={1}>
-              {Platform.OS === 'web' ? (
-                <View style={styles.mapPlaceholder}>
-                  <IconButton icon="map" size={40} iconColor={theme.colors.primary} />
-                  <Text style={{ color: theme.colors.onSurface }}>Map View</Text>
-                  <Text style={{ color: theme.colors.onSurfaceVariant, fontSize: 12 }}>
-                    Lat: {driverLocation.latitude.toFixed(4)}, Lng: {driverLocation.longitude.toFixed(4)}
-                  </Text>
-                </View>
-              ) : (
-                <PlatformMapView
-                  style={styles.map}
-                  region={{
-                    latitude: driverLocation.latitude,
-                    longitude: driverLocation.longitude,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
-                  }}
-                  showsUserLocation={isDriver && locationPermission}
-                  showsMyLocationButton={isDriver && locationPermission}
-                  followsUserLocation={isDriver && isTracking}
-                  onError={() => setMapError(true)}
-                >
-                  <PlatformMarker 
-                    coordinate={driverLocation} 
-                    title={isDriver ? "Your Location" : "Driver Location"}
-                    description={
-                      isDriver 
-                        ? (isTracking ? "Live location" : "Last known location")
-                        : "Driver's current location"
-                    }
-                    pinColor={isDriver ? "#4CAF50" : theme.colors.primary}
-                  />
-                </PlatformMapView>
-              )}
-            </Surface>
-          )}
+          <Surface style={styles.mapContainer} elevation={1}>
+            <PlatformMapView
+              style={styles.map}
+              region={{
+                latitude: driverLocation.latitude,
+                longitude: driverLocation.longitude,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }}
+              showsUserLocation={isDriver && locationPermission}
+              showsMyLocationButton={isDriver && locationPermission}
+              followsUserLocation={isDriver && isTracking}
+            >
+              <PlatformMarker 
+                coordinate={driverLocation} 
+                title={isDriver ? "Your Location" : "Driver Location"}
+                description={
+                  isDriver 
+                    ? (isTracking ? "Live location" : "Last known location")
+                    : "Driver's current location"
+                }
+                pinColor={isDriver ? "#4CAF50" : theme.colors.primary}
+              />
+            </PlatformMapView>
+          </Surface>
         </Card.Content>
       </Card>
 
@@ -381,8 +343,7 @@ const BusScreen = ({ navigation }) => {
           )}
         </Card.Content>
       </Card>
-      </ScrollView>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -391,41 +352,28 @@ export default BusScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 16,
   },
-  header: {
-    paddingTop: 50,
-    paddingBottom: 16,
-    paddingHorizontal: 16,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    flex: 1,
-    textAlign: 'center',
-  },
-  backButton: {
-    margin: 0,
-  },
-  themeButton: {
-    margin: 0,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
+  headerSurface: {
     padding: 20,
-    paddingBottom: 40,
+    marginBottom: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    textAlign: "center",
+    opacity: 0.7,
   },
   scheduleCard: {
-    marginBottom: 20,
-    borderRadius: 16,
-    overflow: 'hidden',
+    marginBottom: 16,
+    borderRadius: 12,
   },
   scheduleRow: {
     flexDirection: 'row',
@@ -449,13 +397,12 @@ const styles = StyleSheet.create({
     marginVertical: 8,
   },
   banner: {
-    marginBottom: 20,
-    borderRadius: 12,
+    marginBottom: 16,
+    borderRadius: 8,
   },
   locationCard: {
-    marginBottom: 20,
-    borderRadius: 16,
-    overflow: 'hidden',
+    marginBottom: 16,
+    borderRadius: 12,
   },
   statusChip: {
     marginRight: 8,
@@ -466,11 +413,14 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   map: {
-    height: 200,
+    height: 250,
     width: '100%',
   },
-  mapErrorContainer: {
-    justifyContent: 'center',
+  driversCard: {
+    marginBottom: 20,
+    borderRadius: 12,
+  },
+  driverItem: {
     padding: 12,
     borderRadius: 8,
     marginVertical: 4,

@@ -11,16 +11,12 @@ import {
 } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import { AuthContext } from "../context/AuthContext";
-import { ThemeContext } from '../context/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Appbar, useTheme, IconButton } from 'react-native-paper';
 
 const API_URL = "https://mad-backend-5ijo.onrender.com"
 
 const UploadScreen = ({ navigation }) => {
   const { authState } = useContext(AuthContext);
-  const theme = useTheme();
-  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
 
@@ -109,33 +105,24 @@ const UploadScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <View style={styles.container}>
       <LinearGradient
-        colors={isDarkMode ? ['#1e3a5f', '#2c5282'] : ['#0056b3', '#0088ff']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
+        colors={['#f97316', '#ea580c']}
         style={styles.header}
       >
         <View style={styles.headerContent}>
-          <IconButton
-            icon="arrow-left"
-            iconColor="#ffffff"
-            size={24}
+          <TouchableOpacity
             onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          />
+            style={styles.gradientBackButton}
+          >
+            <Text style={styles.gradientBackText}>← Back</Text>
+          </TouchableOpacity>
           <Text style={styles.headerTitle}>Upload Menu</Text>
-          <IconButton
-            icon={isDarkMode ? "weather-sunny" : "weather-night"}
-            iconColor="#ffffff"
-            size={24}
-            onPress={toggleTheme}
-            style={styles.themeButton}
-          />
+          <View style={styles.headerSpacer} />
         </View>
       </LinearGradient>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+      <ScrollView style={styles.scrollView}>
         <View style={styles.mainCard}>
           <View style={styles.instructionsSection}>
             <Text style={styles.instructionsTitle}>
@@ -235,29 +222,7 @@ const UploadScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  header: {
-    paddingTop: 50,
-    paddingBottom: 16,
-    paddingHorizontal: 16,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    flex: 1,
-    textAlign: 'center',
-  },
-  backButton: {
-    margin: 0,
-  },
-  themeButton: {
-    margin: 0,
+    backgroundColor: '#f5f5f5',
   },
   center: {
     flex: 1,
@@ -282,18 +247,44 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
+  header: {
+    paddingTop: 48,
+    paddingBottom: 24,
+    paddingHorizontal: 24,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  gradientBackButton: {
+    padding: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 20,
+  },
+  gradientBackText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  headerTitle: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  headerSpacer: {
+    width: 64,
+  },
   scrollView: {
     flex: 1,
-  },
-  scrollContent: {
-    padding: 20,
-    paddingBottom: 40,
+    paddingHorizontal: 24,
+    marginTop: -16,
   },
   mainCard: {
     backgroundColor: '#fff',
     borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
+    padding: 24,
+    marginBottom: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
@@ -398,8 +389,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#bfdbfe',
     borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
+    padding: 24,
+    marginBottom: 32,
   },
   formatGuideHeader: {
     marginBottom: 16,

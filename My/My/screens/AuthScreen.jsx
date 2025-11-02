@@ -8,21 +8,15 @@ import {
   TouchableOpacity,
   Image,
   StatusBar,
-  ScrollView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../context/AuthContext";
-import { ThemeContext } from '../context/ThemeContext';
-import { Appbar, useTheme, IconButton } from 'react-native-paper';
-import { LinearGradient } from 'expo-linear-gradient';
 
 const API_URL = "https://mad-backend-5ijo.onrender.com";
 const PRIMARY_COLOR = "#00CED1";
 
 const AuthScreen = ({ navigation }) => {
   const { setAuthState } = useContext(AuthContext);
-  const theme = useTheme();
-  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -117,36 +111,25 @@ const AuthScreen = ({ navigation }) => {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <StatusBar style={isDarkMode ? "light" : "dark"} />
-      <LinearGradient
-        colors={isDarkMode ? ['#1e3a5f', '#2c5282'] : ['#0056b3', '#0088ff']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={styles.header}
-      >
-        <View style={styles.headerContent}>
-          <IconButton
-            icon="arrow-left"
-            iconColor="#ffffff"
-            size={24}
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
+    <View style={styles.container}>
+      <StatusBar style="dark" />
+      <View style={styles.headerContainer}>
+        <TouchableOpacity 
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Image 
+            source={{ uri: 'https://img.icons8.com/ios-filled/50/000000/back.png' }}
+            style={styles.backIcon}
           />
-          <Text style={styles.headerTitle}>{isLogin ? "Login" : "Sign Up"}</Text>
-          <IconButton
-            icon={isDarkMode ? "weather-sunny" : "weather-night"}
-            iconColor="#ffffff"
-            size={24}
-            onPress={toggleTheme}
-            style={styles.themeButton}
-          />
-        </View>
-      </LinearGradient>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{isLogin ? "Login" : "Sign Up"}</Text>
+        <View style={styles.placeholder} />
+      </View>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.formContainer}>
-        <Text style={[styles.title, { color: theme.colors.onBackground }]}>{isLogin ? "Welcome Back" : "Create Account"}</Text>
-        <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>
+      <View style={styles.formContainer}>
+        <Text style={styles.title}>{isLogin ? "Welcome Back" : "Create Account"}</Text>
+        <Text style={styles.subtitle}>
           {isLogin 
             ? "Sign in to access your account" 
             : "Fill in your details to get started"}
@@ -154,11 +137,7 @@ const AuthScreen = ({ navigation }) => {
 
         <View style={styles.toggleContainerAdminStudentDriverContainer}>
           <TouchableOpacity
-            style={[
-              styles.toggleButton, 
-              { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline },
-              role === "student" && styles.activeToggle
-            ]}
+            style={[styles.toggleButton, role === "student" && styles.activeToggle]}
             onPress={() => setRole("student")}
           >
             <Text style={[styles.toggleText, role === "student" && styles.activeToggleText]}>
@@ -166,11 +145,7 @@ const AuthScreen = ({ navigation }) => {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[
-              styles.toggleButton,
-              { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline },
-              role === "driver" && styles.activeToggle
-            ]}
+            style={[styles.toggleButton, role === "driver" && styles.activeToggle]}
             onPress={() => setRole("driver")}
           >
             <Text style={[styles.toggleText, role === "driver" && styles.activeToggleText]}>
@@ -178,11 +153,7 @@ const AuthScreen = ({ navigation }) => {
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[
-              styles.toggleButton,
-              { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline },
-              role === "admin" && styles.activeToggle
-            ]}
+            style={[styles.toggleButton, role === "admin" && styles.activeToggle]}
             onPress={() => setRole("admin")}
           >
             <Text style={[styles.toggleText, role === "admin" && styles.activeToggleText]}>
@@ -192,15 +163,14 @@ const AuthScreen = ({ navigation }) => {
         </View>
 
         {!isLogin && (
-          <View style={[styles.inputContainer, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
+          <View style={styles.inputContainer}>
             <Image 
               source={{ uri: 'https://img.icons8.com/ios-filled/50/999999/user.png' }}
               style={styles.inputIcon}
             />
             <TextInput
-              style={[styles.input, { color: theme.colors.onSurface }]}
+              style={styles.input}
               placeholder="Name"
-              placeholderTextColor={theme.colors.onSurfaceVariant}
               value={form.name}
               onChangeText={(t) => setForm({ ...form, name: t })}
             />
@@ -208,15 +178,14 @@ const AuthScreen = ({ navigation }) => {
         )}
 
         {role === "student" || role === "admin" ? (
-          <View style={[styles.inputContainer, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
+          <View style={styles.inputContainer}>
             <Image 
               source={{ uri: 'https://img.icons8.com/ios-filled/50/999999/email.png' }}
               style={styles.inputIcon}
             />
             <TextInput
-              style={[styles.input, { color: theme.colors.onSurface }]}
+              style={styles.input}
               placeholder="Email"
-              placeholderTextColor={theme.colors.onSurfaceVariant}
               keyboardType="email-address"
               autoCapitalize="none"
               value={form.email}
@@ -224,15 +193,14 @@ const AuthScreen = ({ navigation }) => {
             />
           </View>
         ) : (
-          <View style={[styles.inputContainer, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
+          <View style={styles.inputContainer}>
             <Image 
               source={{ uri: 'https://img.icons8.com/ios-filled/50/999999/phone.png' }}
               style={styles.inputIcon}
             />
             <TextInput
-              style={[styles.input, { color: theme.colors.onSurface }]}
+              style={styles.input}
               placeholder="Phone"
-              placeholderTextColor={theme.colors.onSurfaceVariant}
               keyboardType="phone-pad"
               value={form.phone}
               onChangeText={(t) => setForm({ ...form, phone: t })}
@@ -240,15 +208,14 @@ const AuthScreen = ({ navigation }) => {
           </View>
         )}
 
-        <View style={[styles.inputContainer, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outline }]}>
+        <View style={styles.inputContainer}>
           <Image 
             source={{ uri: 'https://img.icons8.com/ios-filled/50/999999/password.png' }}
             style={styles.inputIcon}
           />
           <TextInput
-            style={[styles.input, { color: theme.colors.onSurface }]}
+            style={styles.input}
             placeholder="Password"
-            placeholderTextColor={theme.colors.onSurfaceVariant}
             secureTextEntry
             value={form.password}
             onChangeText={(t) => setForm({ ...form, password: t })}
@@ -276,7 +243,7 @@ const AuthScreen = ({ navigation }) => {
             {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Login"}
           </Text>
         </TouchableOpacity>
-      </ScrollView>
+      </View>
     </View>
   );
 };
@@ -284,34 +251,23 @@ const AuthScreen = ({ navigation }) => {
 export default AuthScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  header: {
+  container: { flex: 1, backgroundColor: '#f5f5f5' },
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingTop: 50,
-    paddingBottom: 16,
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
+    paddingBottom: 15,
+    backgroundColor: '#fff',
   },
-  headerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    flex: 1,
-    textAlign: 'center',
-  },
-  backButton: {
-    margin: 0,
-  },
-  themeButton: {
-    margin: 0,
-  },
-  scrollView: { flex: 1 },
-  formContainer: { flexGrow: 1, padding: 20 },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 10, textAlign: "center" },
-  subtitle: { fontSize: 16, marginBottom: 30, textAlign: "center" },
+  backButton: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
+  backIcon: { width: 20, height: 20 },
+  headerTitle: { fontSize: 18, fontWeight: "600", color: "#333" },
+  placeholder: { width: 40 },
+  formContainer: { flex: 1, padding: 20, backgroundColor: '#fff' },
+  title: { fontSize: 24, fontWeight: "bold", marginBottom: 10, textAlign: "center", color: "#333" },
+  subtitle: { fontSize: 16, color: "#666", marginBottom: 30, textAlign: "center" },
   toggleContainer: { flexDirection: "row", marginBottom: 25, justifyContent: "center" },
   toggleContainerAdminStudentDriverContainer: { flexDirection: "row", marginBottom: 25, justifyContent: "center" },
   toggleButton: {
@@ -322,6 +278,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 8,
     marginHorizontal: 5,
+    backgroundColor: "#fff",
   },
   activeToggle: { backgroundColor: PRIMARY_COLOR },
   toggleText: { color: PRIMARY_COLOR, fontWeight: "600" },
@@ -330,12 +287,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
+    borderColor: "#ddd",
     marginBottom: 15,
     borderRadius: 8,
+    backgroundColor: "#f9f9f9",
     paddingHorizontal: 10,
   },
   inputIcon: { width: 20, height: 20, marginRight: 10, opacity: 0.5 },
-  input: { flex: 1, padding: 12, fontSize: 16 },
+  input: { flex: 1, padding: 12, fontSize: 16, color: "#333" },
   submitButton: {
     backgroundColor: PRIMARY_COLOR,
     padding: 15,
@@ -344,7 +303,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 20,
   },
-  disabledButton: { opacity: 0.5 },
+  disabledButton: { backgroundColor: "#cccccc" },
   submitButtonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
   switchModeButton: { alignItems: "center" },
   switchModeText: { color: PRIMARY_COLOR, fontSize: 14 },

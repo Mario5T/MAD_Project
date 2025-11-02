@@ -1,16 +1,7 @@
 import React from 'react';
 import MapView, { Marker } from 'react-native-maps';
 
-const PlatformMapView = ({ children, ...props }) => {
-  return (
-    <MapView {...props}>
-      {children}
-    </MapView>
-  );
-};
+export const PlatformMapView = MapView;
+export const PlatformMarker = Marker;
 
-const PlatformMarker = (props) => {
-  return <Marker {...props} />;
-};
-
-export { PlatformMapView, PlatformMarker };
+export default MapView;
