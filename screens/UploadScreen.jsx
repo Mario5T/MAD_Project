@@ -15,7 +15,7 @@ import { ThemeContext } from '../context/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Appbar, useTheme, IconButton } from 'react-native-paper';
 
-const API_URL = "https://mad-backend-5ijo.onrender.com"
+const API_URL = "https://madbackend-production-e01c.up.railway.app"
 
 const UploadScreen = ({ navigation }) => {
   const { authState } = useContext(AuthContext);
@@ -87,17 +87,26 @@ const UploadScreen = ({ navigation }) => {
         method: "POST",
         headers: {
           Authorization: `Bearer ${authState.user?.token}`,
+          Accept: "application/json",
         },
         body: formData,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Upload failed");
+      const contentType = response.headers.get("content-type") || "";
+      let data = null;
+      let dataText = null;
+      if (contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        dataText = await response.text();
       }
 
-      Alert.alert("Success", "Menu uploaded successfully!", [
+      if (!response.ok) {
+        const message = (data && (data.error || data.message)) || dataText || "Upload failed";
+        throw new Error(message);
+      }
+
+      Alert.alert("Success", (data && (data.message || "Menu uploaded successfully!")) || "Menu uploaded successfully!", [
         { text: "OK", onPress: () => navigation.goBack() },
       ]);
 

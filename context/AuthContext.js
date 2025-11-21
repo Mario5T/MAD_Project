@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    // Wait a bit for Firebase to be properly initialized
+
     const initAuth = async () => {
       try {
         const checkStoredAuth = async () => {
@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
 
         await checkStoredAuth();
 
-        // Set up Firebase auth state listener
+
         const unsubscribe = onAuthStateChanged(auth, (user) => {
           if (user) {
             setAuthState({ isLoggedIn: true, user });
@@ -61,13 +61,10 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      // Sign out from Firebase
       await signOut(auth);
 
-      // Clear local storage
       await AsyncStorage.multiRemove(["token", "userRole"]);
 
-      // Reset auth state
       setAuthState({
         isLoggedIn: false,
         user: null,
