@@ -21,7 +21,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { AuthContext } from "../context/AuthContext";
 import { ThemeContext } from '../context/ThemeContext';
 
-const API_URL = "https://mad-backend-5ijo.onrender.com"
+const API_URL = "https://madbackend-production-e01c.up.railway.app"
 const StarRating = ({ rating, setRating, theme }) => {
   const renderStars = () => {
     const stars = [];
@@ -77,7 +77,7 @@ const FeedbackScreen = ({ navigation }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${authState.user?.uid}`,
+          Authorization: `Bearer ${authState.user?.token}`,
         },
         body: JSON.stringify({ rating: Number(rating), comment }),
       });

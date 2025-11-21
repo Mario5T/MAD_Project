@@ -14,7 +14,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { ThemeContext } from '../context/ThemeContext';
 
-const API_URL = "https://mad-backend-5ijo.onrender.com"
+const API_URL = "https://madbackend-production-e01c.up.railway.app"
 const FoodScreen = ({ navigation }) => {
   const theme = useTheme();
   const { isDarkMode, toggleTheme } = useContext(ThemeContext);

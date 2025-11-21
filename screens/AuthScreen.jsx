@@ -16,7 +16,7 @@ import { ThemeContext } from '../context/ThemeContext';
 import { Appbar, useTheme, IconButton } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const API_URL = "https://mad-backend-5ijo.onrender.com";
+const API_URL = "https://madbackend-production-e01c.up.railway.app";
 const PRIMARY_COLOR = "#00CED1";
 
 const AuthScreen = ({ navigation }) => {

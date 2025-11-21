@@ -20,6 +20,8 @@ import { requestLocationPermission, getCurrentPosition, watchPosition } from "..
 import { AuthContext } from "../context/AuthContext";
 import { ThemeContext } from '../context/ThemeContext';
 
+const API_URL = "https://madbackend-production-e01c.up.railway.app";
+
 const BusScreen = ({ navigation }) => {
   const { authState } = useContext(AuthContext);
   const theme = useTheme();
@@ -129,7 +131,7 @@ const BusScreen = ({ navigation }) => {
       setDriversLoading(true);
       setDriversError(null);
       
-      const response = await fetch("https://mad-backend-5ijo.onrender.com/api/shuttle/", {
+      const response = await fetch(`${API_URL}/api/auth/drivers`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -141,7 +143,7 @@ const BusScreen = ({ navigation }) => {
       }
 
       const data = await response.json();
-      setRegisteredDrivers(data || []);
+      setRegisteredDrivers(data?.drivers || []);
     } catch (error) {
       console.error('Error fetching drivers:', error);
       setDriversError('Failed to load drivers');

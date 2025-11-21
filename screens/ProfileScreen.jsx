@@ -15,7 +15,7 @@ import { ThemeContext } from '../context/ThemeContext';
 import { Button, Card, Surface, useTheme, Text, Appbar, IconButton } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const API_URL = "https://mad-backend-5ijo.onrender.com"
+const API_URL = "https://madbackend-production-e01c.up.railway.app"
 const ProfileScreen = ({ navigation }) => {
   const { authState, setAuthState } = useContext(AuthContext);
   const theme = useTheme();

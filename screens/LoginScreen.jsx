@@ -19,7 +19,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../context/AuthContext";
 
-const API_URL = "https://mad-backend-5ijo.onrender.com"
+const API_URL = "https://madbackend-production-e01c.up.railway.app"
 const PRIMARY_COLOR = "#00CED1";
 
 const LoginScreen = ({ navigation }) => {
