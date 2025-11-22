@@ -13,6 +13,7 @@ import {
 } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ThemeContext } from '../context/ThemeContext';
+import MealCard from '../components/cards/MealCard';
 
 const API_URL = "https://madbackend-production-e01c.up.railway.app"
 const FoodScreen = ({ navigation }) => {
@@ -94,7 +95,7 @@ const FoodScreen = ({ navigation }) => {
         </View>
       </LinearGradient>
 
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
@@ -127,18 +128,25 @@ const FoodScreen = ({ navigation }) => {
           </Card.Content>
         </Card>
 
-        {Object.entries(meals).map(([category, food]) => (
-          <Card key={category} style={styles.mealCard} mode="elevated">
-            <Card.Content>
-              <Title style={[styles.mealCategory, { color: theme.colors.onSurface }]}>
-                {category}
-              </Title>
-              <Text style={[styles.mealFood, { color: theme.colors.onSurfaceVariant }]}>
-                {food}
-              </Text>
-            </Card.Content>
-          </Card>
-        ))}
+        {Object.entries(meals).map(([category, food]) => {
+          const mealTimings = {
+            Breakfast: '7:30-9:00 AM',
+            Lunch: '12:00-2:00 PM',
+            Snacks: '4:00-5:00 PM',
+            Dinner: '7:30-9:00 PM',
+          };
+
+          return (
+            <MealCard
+              key={category}
+              mealType={category}
+              items={food}
+              timing={mealTimings[category]}
+              date={selectedDay === days[0] ? 'Today' : menuData[selectedDay].date}
+              isToday={selectedDay === days[0]}
+            />
+          );
+        })}
       </ScrollView>
     </View>
   );

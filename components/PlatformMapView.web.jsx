@@ -1,7 +1,5 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-
-// Web fallback for MapView
 export const PlatformMapView = ({ children, style, ...props }) => (
   <View style={[styles.mapPlaceholder, style]}>
     <Text style={styles.placeholderText}>Map View (Web)</Text>

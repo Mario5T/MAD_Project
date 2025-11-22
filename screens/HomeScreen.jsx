@@ -1,15 +1,15 @@
-import React, { useContext } from "react";
-import { 
-  View, 
-  StyleSheet, 
-  ScrollView, 
+import React, { useContext, useState, useEffect } from "react";
+import {
+  View,
+  StyleSheet,
+  ScrollView,
   Dimensions,
   TouchableOpacity,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { 
-  Text, 
-  Card, 
+import {
+  Text,
+  Card,
   useTheme,
   Surface,
   IconButton,
@@ -18,8 +18,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { AuthContext } from "../context/AuthContext";
 import { ThemeContext } from '../context/ThemeContext';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import CountdownTimer from '../components/shared/CountdownTimer';
 
-const { width } = Dimensions.get('window'); 
+const { width } = Dimensions.get('window');
+
+const API_URL = "https://madbackend-production-e01c.up.railway.app";
 
 const HomeScreen = ({ navigation }) => {
   const { authState } = useContext(AuthContext);
@@ -29,6 +32,72 @@ const HomeScreen = ({ navigation }) => {
   const isLoggedIn = authState.isLoggedIn;
   const userRole = authState.user?.role;
   const userName = authState.user?.name || 'User';
+
+  const [nextMeal, setNextMeal] = useState(null);
+  const [greeting, setGreeting] = useState('');
+
+  // Get time-based greeting
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting('Good Morning');
+    else if (hour < 17) setGreeting('Good Afternoon');
+    else setGreeting('Good Evening');
+  }, []);
+
+  // Fetch next meal
+  useEffect(() => {
+    const fetchNextMeal = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/menu/all`);
+        const data = await response.json();
+
+        if (response.ok) {
+          // Find today's meals
+          const days = Object.keys(data);
+          const today = days[0]; // Assuming first day is today
+          const meals = data[today]?.meals;
+
+          if (meals) {
+            const now = new Date();
+            const hour = now.getHours();
+
+            // Determine next meal based on time
+            let mealType = 'Lunch';
+            let mealTime = new Date();
+
+            if (hour < 9) {
+              mealType = 'Breakfast';
+              mealTime.setHours(8, 0, 0);
+            } else if (hour < 13) {
+              mealType = 'Lunch';
+              mealTime.setHours(13, 0, 0);
+            } else if (hour < 16) {
+              mealType = 'Snacks';
+              mealTime.setHours(16, 30, 0);
+            } else if (hour < 20) {
+              mealType = 'Dinner';
+              mealTime.setHours(20, 0, 0);
+            } else {
+              // After dinner, show tomorrow's breakfast
+              mealType = 'Breakfast';
+              mealTime.setDate(mealTime.getDate() + 1);
+              mealTime.setHours(8, 0, 0);
+            }
+
+            setNextMeal({
+              type: mealType,
+              items: meals[mealType] || 'Menu not available',
+              time: mealTime,
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching next meal:', error);
+      }
+    };
+
+    fetchNextMeal();
+  }, []);
 
   const cards = [
     {
@@ -89,7 +158,7 @@ const HomeScreen = ({ navigation }) => {
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <StatusBar style={isDarkMode ? "light" : "dark"} />
-      
+
       {/* Header */}
       <LinearGradient
         colors={isDarkMode ? ['#1e3a5f', '#2c5282'] : ['#0056b3', '#0088ff']}
@@ -99,6 +168,9 @@ const HomeScreen = ({ navigation }) => {
       >
         <View style={styles.headerContent}>
           <View>
+            <Text style={styles.welcomeText}>
+              {greeting}{isLoggedIn ? `, ${userName}` : ''}! ☀️
+            </Text>
             <Text style={styles.userName}>RevRacker</Text>
           </View>
           <View style={styles.headerActions}>
@@ -110,7 +182,7 @@ const HomeScreen = ({ navigation }) => {
               style={styles.themeButton}
             />
             {isLoggedIn && (
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.profileButton}
                 onPress={() => navigation.navigate('Profile')}
               >
@@ -120,12 +192,68 @@ const HomeScreen = ({ navigation }) => {
           </View>
         </View>
         <Text style={styles.subtitle}>
-          Access all campus services from one convenient dashboard
+          {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
         </Text>
       </LinearGradient>
-      
+
+      {/* What's Next Section */}
+      {nextMeal && (
+        <View style={styles.whatsNextSection}>
+          <Text style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>
+            📍 What's Next
+          </Text>
+
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate('Food')}
+          >
+            <Card style={[styles.whatsNextCard, { backgroundColor: theme.colors.surface }]} mode="elevated" elevation={3}>
+              <LinearGradient
+                colors={
+                  nextMeal.type === 'Breakfast' ? ['#ff9800', '#ffb74d'] :
+                    nextMeal.type === 'Lunch' ? ['#4caf50', '#66bb6a'] :
+                      nextMeal.type === 'Snacks' ? ['#ff6b00', '#ff9248'] :
+                        ['#9c27b0', '#ba68c8']
+                }
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.cardAccent}
+              />
+
+              <Card.Content style={styles.whatsNextContent}>
+                <View style={styles.mealHeader}>
+                  <View style={styles.mealInfo}>
+                    <Text style={[styles.mealIcon, { fontSize: 32 }]}>
+                      {nextMeal.type === 'Breakfast' ? '☀️' :
+                        nextMeal.type === 'Lunch' ? '🍛' :
+                          nextMeal.type === 'Snacks' ? '🍪' : '🌙'}
+                    </Text>
+                    <View>
+                      <Text style={[styles.mealType, { color: theme.colors.onSurface }]}>
+                        {nextMeal.type}
+                      </Text>
+                      <CountdownTimer
+                        targetTime={nextMeal.time}
+                        compact={true}
+                      />
+                    </View>
+                  </View>
+                  <Icon name="arrow-right" size={24} color={theme.colors.primary} />
+                </View>
+
+                <View style={[styles.mealItemsContainer, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)' }]}>
+                  <Text style={[styles.mealItems, { color: theme.colors.onSurfaceVariant }]} numberOfLines={2}>
+                    {nextMeal.items}
+                  </Text>
+                </View>
+              </Card.Content>
+            </Card>
+          </TouchableOpacity>
+        </View>
+      )}
+
       {/* Cards Grid */}
-      <ScrollView 
+      <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.cardsContainer}
         showsVerticalScrollIndicator={false}
@@ -145,7 +273,7 @@ const HomeScreen = ({ navigation }) => {
                 end={{ x: 1, y: 0 }}
                 style={styles.cardAccent}
               />
-              
+
               <Card.Content style={styles.cardContent}>
                 {/* Icon Container */}
                 <View style={[styles.iconContainer, { backgroundColor: card.iconBg }]}>
@@ -160,26 +288,26 @@ const HomeScreen = ({ navigation }) => {
           </TouchableOpacity>
         ))}
       </ScrollView>
-      
+
       {/* Bottom Navigation */}
       <Surface style={[styles.bottomNav, { backgroundColor: theme.colors.surface }]} elevation={4}>
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Home')}>
           <Icon name="home" size={24} color={theme.colors.primary} />
           <Text style={[styles.navText, { color: theme.colors.primary }]}>Home</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Food')}>
           <Icon name="silverware-fork-knife" size={24} color={theme.colors.onSurfaceVariant} />
           <Text style={[styles.navText, { color: theme.colors.onSurfaceVariant }]}>Menu</Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Bus')}>
           <Icon name="bus" size={24} color={theme.colors.onSurfaceVariant} />
           <Text style={[styles.navText, { color: theme.colors.onSurfaceVariant }]}>Shuttle</Text>
         </TouchableOpacity>
-        
-        <TouchableOpacity 
-          style={styles.navItem} 
+
+        <TouchableOpacity
+          style={styles.navItem}
           onPress={() => isLoggedIn ? navigation.navigate('Profile') : navigation.navigate('Auth')}
         >
           <Icon name="account" size={24} color={theme.colors.onSurfaceVariant} />
@@ -239,6 +367,49 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.85)',
     fontWeight: '500',
     maxWidth: '90%',
+  },
+  whatsNextSection: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 12,
+  },
+  whatsNextCard: {
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  whatsNextContent: {
+    padding: 16,
+  },
+  mealHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  mealInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  mealIcon: {
+    fontSize: 28,
+  },
+  mealType: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  mealItemsContainer: {
+    padding: 12,
+    borderRadius: 8,
+  },
+  mealItems: {
+    fontSize: 14,
+    lineHeight: 20,
   },
   scrollView: {
     flex: 1,
