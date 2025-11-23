@@ -1,4 +1,3 @@
-// Modern theme configuration based on web-frontend design
 import { MD3LightTheme, MD3DarkTheme } from 'react-native-paper';
 
 export const lightTheme = {
