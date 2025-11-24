@@ -1,4 +1,4 @@
-<video src="assets/WhatsApp Video 2025-11-25 at 00.34.07.mp4" controls width="700"></video>
+<video src="assets/WhatsApp Video 2025-11-25 at 00.34.07.mp4" controls width="800"></video>
 
 
 [![Expo Build](https://expo.dev/accounts/aditya5t/projects/revracker/builds/db6b1766-22da-4477-80aa-9b90fd4d6b1e)
