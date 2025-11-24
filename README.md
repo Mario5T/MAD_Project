@@ -1,8 +1,8 @@
 <video src="https://raw.githubusercontent.com/Mario5T/MAD_Project/main/assets/WhatsApp%20Video%202025-11-25%20at%2000.34.07.mp4" controls width="800"></video>
 
 
+[![Expo Build](https://expo.dev/accounts/aditya5t/projects/revracker/builds/db6b1766-22da-4477-80aa-9b90fd4d6b1e.png)](https://expo.dev/accounts/aditya5t/projects/revracker/builds/db6b1766-22da-4477-80aa-9b90fd4d6b1e)
 
-[![Expo Build](https://expo.dev/accounts/aditya5t/projects/revracker/builds/db6b1766-22da-4477-80aa-9b90fd4d6b1e)]
 
 
 # 🚀 Contributing  
