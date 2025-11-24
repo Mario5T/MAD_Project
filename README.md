@@ -2,7 +2,7 @@
 
 
 
-[![Expo Build](https://expo.dev/accounts/aditya5t/projects/revracker/builds/db6b1766-22da-4477-80aa-9b90fd4d6b1e)
+[![Expo Build](https://expo.dev/accounts/aditya5t/projects/revracker/builds/db6b1766-22da-4477-80aa-9b90fd4d6b1e)]
 
 
 # 🚀 Contributing  
