@@ -25,9 +25,10 @@ const API_URL = "https://madbackend-production-e01c.up.railway.app";
 const BusScreen = ({ navigation }) => {
   const { authState } = useContext(AuthContext);
   const theme = useTheme();
-  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
+  const themeContext = useContext(ThemeContext);
+  const { isDarkMode, toggleTheme } = themeContext || { isDarkMode: false, toggleTheme: () => { } };
   const isDriver = authState?.user?.role === 'driver';
-  
+
   const schedule = [
     { id: "1", time: "8:30 AM", route: "Campus → Lohegaon" },
     { id: "2", time: "01:30 PM", route: "Lohegaon → Campus" },
@@ -54,7 +55,7 @@ const BusScreen = ({ navigation }) => {
     } else {
       setLocationError('Location tracking is only available for drivers');
     }
-    
+
     // Cleanup on unmount
     return () => {
       if (locationSubscription) {
@@ -71,7 +72,7 @@ const BusScreen = ({ navigation }) => {
   const requestLocationPermissionHandler = async () => {
     try {
       const { status } = await requestLocationPermission();
-      
+
       if (status !== 'granted') {
         setLocationError('Location permission denied');
         Alert.alert(
@@ -93,10 +94,10 @@ const BusScreen = ({ navigation }) => {
   const startLocationTracking = async () => {
     try {
       setIsTracking(true);
-      
+
       // Get initial location
       const location = await getCurrentPosition();
-      
+
       setDriverLocation({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
@@ -116,7 +117,7 @@ const BusScreen = ({ navigation }) => {
       setLocationError('Failed to get location');
       setIsTracking(false);
       console.error('Location tracking error:', error);
-      
+
       Alert.alert(
         'Location Error',
         'Unable to get current location. Please check your location settings.',
@@ -130,7 +131,7 @@ const BusScreen = ({ navigation }) => {
     try {
       setDriversLoading(true);
       setDriversError(null);
-      
+
       const response = await fetch(`${API_URL}/api/auth/drivers`, {
         method: 'GET',
         headers: {
@@ -182,207 +183,207 @@ const BusScreen = ({ navigation }) => {
       </LinearGradient>
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-      {/* Schedule Card */}
-      <Card style={styles.scheduleCard} elevation={3}>
-        <Card.Title 
-          title="Today's Schedule" 
-          left={(props) => <IconButton {...props} icon="clock-outline" />}
-        />
-        <Card.Content>
-          {schedule.map((item, index) => (
-            <View key={item.id}>
-              <View style={styles.scheduleRow}>
-                <Chip 
-                  mode="outlined" 
-                  style={styles.timeChip}
-                  textStyle={styles.timeText}
-                >
-                  {item.time}
-                </Chip>
-                <Text style={styles.routeText}>{item.route}</Text>
-              </View>
-              {index < schedule.length - 1 && <Divider style={styles.divider} />}
-            </View>
-          ))}
-        </Card.Content>
-      </Card>
-
-      {/* Location Status Banner */}
-      {!isDriver && (
-        <Banner
-          visible={true}
-          actions={[]}
-          icon="information-outline"
-          style={styles.banner}
-        >
-          You are viewing the driver's location. Only drivers can share their live location.
-        </Banner>
-      )}
-
-      {/* Location Card */}
-      <Card style={styles.locationCard} elevation={3}>
-        <Card.Title 
-          title={isDriver ? 'Your Location (Driver)' : 'Driver Location'}
-          subtitle={
-            isDriver 
-              ? (isTracking ? 'Live tracking active' : locationError || 'Location unavailable')
-              : 'View only mode'
-          }
-          left={(props) => (
-            <IconButton 
-              {...props} 
-              icon={isDriver ? "account-circle" : "map-marker"} 
-              iconColor={isTracking ? theme.colors.primary : theme.colors.error}
-            />
-          )}
-          right={(props) => (
-            <Chip 
-              mode="flat" 
-              style={[
-                styles.statusChip, 
-                { backgroundColor: isTracking ? theme.colors.primaryContainer : theme.colors.errorContainer }
-              ]}
-              textStyle={{ color: isTracking ? theme.colors.onPrimaryContainer : theme.colors.onErrorContainer }}
-            >
-              {isTracking ? 'LIVE' : 'OFFLINE'}
-            </Chip>
-          )}
-        />
-        <Card.Content>
-          {mapError ? (
-            <Surface style={[styles.mapContainer, styles.mapErrorContainer]} elevation={1}>
-              <IconButton icon="map-marker-off" size={40} iconColor={theme.colors.error} />
-              <Text style={{ color: theme.colors.onSurface, marginTop: 8 }}>Map unavailable</Text>
-              <Text style={{ color: theme.colors.onSurfaceVariant, fontSize: 12, marginTop: 4 }}>
-                Location: {driverLocation.latitude.toFixed(4)}, {driverLocation.longitude.toFixed(4)}
-              </Text>
-            </Surface>
-          ) : (
-            <Surface style={styles.mapContainer} elevation={1}>
-              {Platform.OS === 'web' ? (
-                <View style={styles.mapPlaceholder}>
-                  <IconButton icon="map" size={40} iconColor={theme.colors.primary} />
-                  <Text style={{ color: theme.colors.onSurface }}>Map View</Text>
-                  <Text style={{ color: theme.colors.onSurfaceVariant, fontSize: 12 }}>
-                    Lat: {driverLocation.latitude.toFixed(4)}, Lng: {driverLocation.longitude.toFixed(4)}
-                  </Text>
+        {/* Schedule Card */}
+        <Card style={styles.scheduleCard} elevation={3}>
+          <Card.Title
+            title="Today's Schedule"
+            left={(props) => <IconButton {...props} icon="clock-outline" />}
+          />
+          <Card.Content>
+            {schedule.map((item, index) => (
+              <View key={item.id}>
+                <View style={styles.scheduleRow}>
+                  <Chip
+                    mode="outlined"
+                    style={styles.timeChip}
+                    textStyle={styles.timeText}
+                  >
+                    {item.time}
+                  </Chip>
+                  <Text style={styles.routeText}>{item.route}</Text>
                 </View>
-              ) : (
-                <PlatformMapView
-                  style={styles.map}
-                  region={{
-                    latitude: driverLocation.latitude,
-                    longitude: driverLocation.longitude,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
-                  }}
-                  showsUserLocation={isDriver && locationPermission}
-                  showsMyLocationButton={isDriver && locationPermission}
-                  followsUserLocation={isDriver && isTracking}
-                  onError={() => setMapError(true)}
-                >
-                  <PlatformMarker 
-                    coordinate={driverLocation} 
-                    title={isDriver ? "Your Location" : "Driver Location"}
-                    description={
-                      isDriver 
-                        ? (isTracking ? "Live location" : "Last known location")
-                        : "Driver's current location"
-                    }
-                    pinColor={isDriver ? "#4CAF50" : theme.colors.primary}
-                  />
-                </PlatformMapView>
-              )}
-            </Surface>
-          )}
-        </Card.Content>
-      </Card>
-
-      {/* Registered Drivers Card */}
-      <Card style={styles.driversCard} elevation={2}>
-        <Card.Title 
-          title="Registered Drivers" 
-          left={(props) => <IconButton {...props} icon="account-group" />}
-          right={(props) => 
-            driversLoading ? (
-              <ActivityIndicator size="small" color={theme.colors.primary} style={{ marginRight: 16 }} />
-            ) : (
-              <IconButton 
-                {...props} 
-                icon="refresh" 
-                onPress={fetchRegisteredDrivers}
-                size={20}
-              />
-            )
-          }
-        />
-        <Card.Content>
-          {driversLoading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={theme.colors.primary} />
-              <Text style={styles.loadingText}>Loading drivers...</Text>
-            </View>
-          ) : driversError ? (
-            <View style={styles.errorContainer}>
-              <Text style={[styles.errorText, { color: theme.colors.error }]}>
-                {driversError}
-              </Text>
-              <Button 
-                mode="outlined" 
-                onPress={fetchRegisteredDrivers}
-                style={styles.retryButton}
-              >
-                Retry
-              </Button>
-            </View>
-          ) : registeredDrivers.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Text style={styles.emptyText}>No registered drivers</Text>
-            </View>
-          ) : (
-            registeredDrivers.map((driver, index) => (
-              <View key={driver.id || driver._id}>
-                <Surface style={styles.driverItem} elevation={1}>
-                  <View style={styles.driverInfo}>
-                    <View style={styles.driverHeader}>
-                      <Text style={styles.driverName}>{driver.name || driver.fullName}</Text>
-                      <Chip 
-                        mode="flat" 
-                        style={[
-                          styles.driverStatusChip, 
-                          { backgroundColor: driver.status === 'active' ? theme.colors.primaryContainer : theme.colors.surfaceVariant }
-                        ]}
-                        textStyle={{ 
-                          color: driver.status === 'active' ? theme.colors.onPrimaryContainer : theme.colors.onSurfaceVariant,
-                          fontSize: 10
-                        }}
-                      >
-                        {(driver.status || 'offline').toUpperCase()}
-                      </Chip>
-                    </View>
-                    <Text style={styles.driverRoute}>{driver.route || 'Campus ↔ Lohegaon'}</Text>
-                    <View style={styles.phoneContainer}>
-                      <IconButton 
-                        icon="phone" 
-                        size={16} 
-                        onPress={() => Linking.openURL(`tel:${driver.phone || driver.phoneNumber}`)}
-                        style={styles.phoneIcon}
-                      />
-                      <Text 
-                        style={[styles.phoneNumber, { color: theme.colors.primary }]}
-                        onPress={() => Linking.openURL(`tel:${driver.phone || driver.phoneNumber}`)}
-                      >
-                        {driver.phone || driver.phoneNumber || 'No phone number'}
-                      </Text>
-                    </View>
-                  </View>
-                </Surface>
-                {index < registeredDrivers.length - 1 && <Divider style={styles.driverDivider} />}
+                {index < schedule.length - 1 && <Divider style={styles.divider} />}
               </View>
-            ))
-          )}
-        </Card.Content>
-      </Card>
+            ))}
+          </Card.Content>
+        </Card>
+
+        {/* Location Status Banner */}
+        {!isDriver && (
+          <Banner
+            visible={true}
+            actions={[]}
+            icon="information-outline"
+            style={styles.banner}
+          >
+            You are viewing the driver's location. Only drivers can share their live location.
+          </Banner>
+        )}
+
+        {/* Location Card */}
+        <Card style={styles.locationCard} elevation={3}>
+          <Card.Title
+            title={isDriver ? 'Your Location (Driver)' : 'Driver Location'}
+            subtitle={
+              isDriver
+                ? (isTracking ? 'Live tracking active' : locationError || 'Location unavailable')
+                : 'View only mode'
+            }
+            left={(props) => (
+              <IconButton
+                {...props}
+                icon={isDriver ? "account-circle" : "map-marker"}
+                iconColor={isTracking ? theme.colors.primary : theme.colors.error}
+              />
+            )}
+            right={(props) => (
+              <Chip
+                mode="flat"
+                style={[
+                  styles.statusChip,
+                  { backgroundColor: isTracking ? theme.colors.primaryContainer : theme.colors.errorContainer }
+                ]}
+                textStyle={{ color: isTracking ? theme.colors.onPrimaryContainer : theme.colors.onErrorContainer }}
+              >
+                {isTracking ? 'LIVE' : 'OFFLINE'}
+              </Chip>
+            )}
+          />
+          <Card.Content>
+            {mapError ? (
+              <Surface style={[styles.mapContainer, styles.mapErrorContainer]} elevation={1}>
+                <IconButton icon="map-marker-off" size={40} iconColor={theme.colors.error} />
+                <Text style={{ color: theme.colors.onSurface, marginTop: 8 }}>Map unavailable</Text>
+                <Text style={{ color: theme.colors.onSurfaceVariant, fontSize: 12, marginTop: 4 }}>
+                  Location: {driverLocation.latitude.toFixed(4)}, {driverLocation.longitude.toFixed(4)}
+                </Text>
+              </Surface>
+            ) : (
+              <Surface style={styles.mapContainer} elevation={1}>
+                {Platform.OS === 'web' ? (
+                  <View style={styles.mapPlaceholder}>
+                    <IconButton icon="map" size={40} iconColor={theme.colors.primary} />
+                    <Text style={{ color: theme.colors.onSurface }}>Map View</Text>
+                    <Text style={{ color: theme.colors.onSurfaceVariant, fontSize: 12 }}>
+                      Lat: {driverLocation.latitude.toFixed(4)}, Lng: {driverLocation.longitude.toFixed(4)}
+                    </Text>
+                  </View>
+                ) : (
+                  <PlatformMapView
+                    style={styles.map}
+                    region={{
+                      latitude: driverLocation.latitude,
+                      longitude: driverLocation.longitude,
+                      latitudeDelta: 0.01,
+                      longitudeDelta: 0.01,
+                    }}
+                    showsUserLocation={isDriver && locationPermission}
+                    showsMyLocationButton={isDriver && locationPermission}
+                    followsUserLocation={isDriver && isTracking}
+                    onError={() => setMapError(true)}
+                  >
+                    <PlatformMarker
+                      coordinate={driverLocation}
+                      title={isDriver ? "Your Location" : "Driver Location"}
+                      description={
+                        isDriver
+                          ? (isTracking ? "Live location" : "Last known location")
+                          : "Driver's current location"
+                      }
+                      pinColor={isDriver ? "#4CAF50" : theme.colors.primary}
+                    />
+                  </PlatformMapView>
+                )}
+              </Surface>
+            )}
+          </Card.Content>
+        </Card>
+
+        {/* Registered Drivers Card */}
+        <Card style={styles.driversCard} elevation={2}>
+          <Card.Title
+            title="Registered Drivers"
+            left={(props) => <IconButton {...props} icon="account-group" />}
+            right={(props) =>
+              driversLoading ? (
+                <ActivityIndicator size="small" color={theme.colors.primary} style={{ marginRight: 16 }} />
+              ) : (
+                <IconButton
+                  {...props}
+                  icon="refresh"
+                  onPress={fetchRegisteredDrivers}
+                  size={20}
+                />
+              )
+            }
+          />
+          <Card.Content>
+            {driversLoading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={theme.colors.primary} />
+                <Text style={styles.loadingText}>Loading drivers...</Text>
+              </View>
+            ) : driversError ? (
+              <View style={styles.errorContainer}>
+                <Text style={[styles.errorText, { color: theme.colors.error }]}>
+                  {driversError}
+                </Text>
+                <Button
+                  mode="outlined"
+                  onPress={fetchRegisteredDrivers}
+                  style={styles.retryButton}
+                >
+                  Retry
+                </Button>
+              </View>
+            ) : registeredDrivers.length === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No registered drivers</Text>
+              </View>
+            ) : (
+              registeredDrivers.map((driver, index) => (
+                <View key={driver.id || driver._id}>
+                  <Surface style={styles.driverItem} elevation={1}>
+                    <View style={styles.driverInfo}>
+                      <View style={styles.driverHeader}>
+                        <Text style={styles.driverName}>{driver.name || driver.fullName}</Text>
+                        <Chip
+                          mode="flat"
+                          style={[
+                            styles.driverStatusChip,
+                            { backgroundColor: driver.status === 'active' ? theme.colors.primaryContainer : theme.colors.surfaceVariant }
+                          ]}
+                          textStyle={{
+                            color: driver.status === 'active' ? theme.colors.onPrimaryContainer : theme.colors.onSurfaceVariant,
+                            fontSize: 10
+                          }}
+                        >
+                          {(driver.status || 'offline').toUpperCase()}
+                        </Chip>
+                      </View>
+                      <Text style={styles.driverRoute}>{driver.route || 'Campus ↔ Lohegaon'}</Text>
+                      <View style={styles.phoneContainer}>
+                        <IconButton
+                          icon="phone"
+                          size={16}
+                          onPress={() => Linking.openURL(`tel:${driver.phone || driver.phoneNumber}`)}
+                          style={styles.phoneIcon}
+                        />
+                        <Text
+                          style={[styles.phoneNumber, { color: theme.colors.primary }]}
+                          onPress={() => Linking.openURL(`tel:${driver.phone || driver.phoneNumber}`)}
+                        >
+                          {driver.phone || driver.phoneNumber || 'No phone number'}
+                        </Text>
+                      </View>
+                    </View>
+                  </Surface>
+                  {index < registeredDrivers.length - 1 && <Divider style={styles.driverDivider} />}
+                </View>
+              ))
+            )}
+          </Card.Content>
+        </Card>
       </ScrollView>
     </View>
   );
@@ -544,5 +545,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     opacity: 0.7,
     textAlign: 'center',
+  },
+  driversCard: {
+    marginBottom: 20,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  driverItem: {
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 4,
+  },
+  mapPlaceholder: {
+    height: 200,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
   },
 });

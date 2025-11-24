@@ -28,7 +28,12 @@
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
       ],
-      "package": "com.aditya5t.revracker"
+      "package": "com.aditya5t.revracker",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDQnjVcMDDsF1SJHURlIQ4ATc13a1pvIBE"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png",
